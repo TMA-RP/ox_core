@@ -8,7 +8,6 @@ import {
   GetCharacters,
   IsStateIdAvailable,
   RemoveCharacterLicense,
-  UpdateCharacterLicense,
   SaveCharacterData,
   UpdateCharacterLicense
 } from './db';
