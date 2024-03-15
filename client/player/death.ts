@@ -1,5 +1,5 @@
 import { cache, requestAnimDict, sleep, notify, triggerServerCallback } from '@overextended/ox_lib/client';
-import { Vector3, Vector4 } from '@nativewrappers/fivem';
+import { Vector4 } from '@nativewrappers/fivem';
 import { OxPlayer } from 'player';
 import { formatDistanceStrict } from "date-fns";
 import { fr } from "date-fns/locale";
