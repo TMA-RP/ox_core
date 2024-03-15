@@ -1,17 +1,11 @@
 import { CHARACTER_SLOTS, DEFAULT_SPAWN } from 'config';
 import { sleep } from '@overextended/ox_lib';
 import {
-  alertDialog,
-  inputDialog,
-  registerContext,
-  showContext,
-  triggerServerCallback,
   cache,
 } from '@overextended/ox_lib/client';
 import { OxPlayer } from './';
 import { netEvent } from 'utils';
-import locale from '../../common/locales';
-import { Character, NewCharacter } from 'types';
+import { Character } from 'types';
 
 let playerIsHidden = false;
 let camActive = false;
@@ -52,20 +46,21 @@ async function StartSession() {
   SetMaxWantedLevel(0);
   NetworkSetFriendlyFireOption(true);
   SetPlayerHealthRechargeMultiplier(cache.playerId, 0.0);
+  emit("ceeb_hud:display", true)
 }
 
-async function StartCharacterSelect() {
+async function StartCharacterSelect(characters: Character[]) {
   while (!IsScreenFadedOut()) {
     DoScreenFadeOut(0);
     await sleep(0);
   }
 
-  SetEntityCoordsNoOffset(cache.ped, DEFAULT_SPAWN[0], DEFAULT_SPAWN[1], DEFAULT_SPAWN[2], true, true, false);
+  SetEntityCoordsNoOffset(cache.ped, DEFAULT_SPAWN[0], DEFAULT_SPAWN[1], DEFAULT_SPAWN[2] - 1.0, true, true, false);
   StartPlayerTeleport(
     cache.playerId,
     DEFAULT_SPAWN[0],
     DEFAULT_SPAWN[1],
-    DEFAULT_SPAWN[2],
+    DEFAULT_SPAWN[2] - 1.0,
     DEFAULT_SPAWN[3],
     false,
     true,
@@ -75,24 +70,22 @@ async function StartCharacterSelect() {
   while (!UpdatePlayerTeleport(cache.playerId)) await sleep(0);
 
   camActive = true;
-  const camOffset = GetOffsetFromEntityInWorldCoords(cache.ped, 0.0, 4.7, 0.2);
   const cam = CreateCameraWithParams(
-    'DEFAULT_SCRIPTED_CAMERA',
-    camOffset[0],
-    camOffset[1],
-    camOffset[2],
-    0.0,
-    0.0,
-    0.0,
-    30.0,
-    false,
-    0
-  );
+    "DEFAULT_SCRIPTED_CAMERA", 
+    2151.5132, 
+    2921.0088, 
+    -60.9020, 
+    266.2535, 
+    0.00, 
+    0.00, 
+    40.00, 
+    false, 
+    0);
 
   SetCamActive(cam, true);
   RenderScriptCams(true, false, 0, true, true);
-  PointCamAtCoord(cam, DEFAULT_SPAWN[0], DEFAULT_SPAWN[1], DEFAULT_SPAWN[2] + 0.1);
-  DoScreenFadeIn(200);
+  PointCamAtCoord(cam, DEFAULT_SPAWN[0], DEFAULT_SPAWN[1], DEFAULT_SPAWN[2]);
+  emit("ceeb_multichar:receiveChars", characters, CHARACTER_SLOTS)
 
   while (camActive) await sleep(0);
 
@@ -117,146 +110,6 @@ async function SpawnPlayer(x: number, y: number, z: number, heading: number) {
   while (!HasCollisionLoadedAroundEntity(cache.ped)) await sleep(0);
 }
 
-function CreateCharacterMenu(characters: Character[]) {
-  //todo: export ContextMenuArrayItem and such from ox_lib
-  const options: any[] = new Array(characters.length);
-
-  characters.forEach((character, index) => {
-    const coords: number[] = character.x ? [character.x || 0, character.y || 0, character.z || 0] : DEFAULT_SPAWN;
-
-    options[index] = {
-      title: `${character.firstName} ${character.lastName}`,
-      description: `${GetLabelText(GetNameOfZone(coords[0], coords[1], coords[2]))}`,
-      onSelect: () => {
-        emitNet('ox:setActiveCharacter', character.charId);
-      },
-    };
-  });
-
-  if (characters.length < CHARACTER_SLOTS) {
-    options.push({
-      title: locale('empty_slot'),
-      description: locale('create_character'),
-      onSelect: async () => {
-        const input = await inputDialog(
-          locale('create_character'),
-          [
-            {
-              type: 'input',
-              required: true,
-              icon: 'user-pen',
-              label: locale('firstname'),
-              placeholder: 'John',
-            },
-            {
-              type: 'input',
-              required: true,
-              icon: 'user-pen',
-              label: locale('lastname'),
-              placeholder: 'Smith',
-            },
-            {
-              type: 'select',
-              required: true,
-              icon: 'circle-user',
-              label: locale('gender'),
-              options: [
-                {
-                  label: locale('male'),
-                  value: 'male',
-                },
-                {
-                  label: locale('female'),
-                  value: 'female',
-                },
-                {
-                  label: locale('non_binary'),
-                  value: 'non_binary',
-                },
-              ],
-            },
-            {
-              type: 'date',
-              required: true,
-              icon: 'calendar-days',
-              label: locale('date_of_birth'),
-              format: 'YYYY-MM-DD',
-              min: '1900-01-01',
-              max: '2006-01-01',
-              default: '2006-01-01',
-            },
-          ],
-          {
-            allowCancel: false,
-          }
-        );
-
-        if (!input) return showContext('ox:characterSelect');
-
-        const character: NewCharacter = {
-          firstName: input[0] as string,
-          lastName: input[1] as string,
-          gender: input[2] as string,
-          date: input[3] as number,
-        };
-
-        emitNet('ox:setActiveCharacter', character);
-      },
-    });
-  }
-
-  if (characters.length > 0) {
-    options.push({
-      title: locale('delete_character'),
-      onSelect: async () => {
-        const input = await inputDialog(
-          locale('delete_character'),
-          [
-            {
-              type: 'select',
-              label: locale('select_character'),
-              required: true,
-              options: characters.map((character, index) => {
-                return { label: `${character.firstName} ${character.lastName}`, value: index.toString() };
-              }),
-            },
-          ],
-          { allowCancel: true }
-        );
-
-        if (!input) return showContext('ox:characterSelect');
-
-        const character = characters[input[0] as number];
-        const deleteChar = await alertDialog({
-          header: locale('delete_character_title'),
-          content: locale('delete_character_confirm', character.firstName, character.lastName),
-          cancel: true,
-        });
-
-        if (deleteChar === 'confirm') {
-          const success = await triggerServerCallback<boolean>('ox:deleteCharacter', 0, character.charId);
-
-          if (success) {
-            characters.splice(input[0] as number, 1);
-            return CreateCharacterMenu(characters);
-          }
-        }
-
-        showContext('ox:characterSelect');
-      },
-    });
-  }
-
-  registerContext({
-    id: 'ox:characterSelect',
-    title: locale('select_character_title'),
-    canClose: false,
-    options,
-  });
-
-  showContext('ox:characterSelect');
-}
-
 netEvent('ox:startCharacterSelect', async (_userId: number, characters: Character[]) => {
   if (OxPlayer.isLoaded) {
     DEV: console.info('Character is already loaded - resetting data');
@@ -264,13 +117,11 @@ netEvent('ox:startCharacterSelect', async (_userId: number, characters: Characte
     emit('ox:playerLogout');
   }
 
-  playerIsHidden = true;
+//   playerIsHidden = true;
   StartSession();
-  StartCharacterSelect();
+  StartCharacterSelect(characters);
 
   while (IsScreenFadedOut()) await sleep(0);
-
-  CreateCharacterMenu(characters);
 });
 
 netEvent('ox:setActiveCharacter', async (character: Character) => {
@@ -282,13 +133,29 @@ netEvent('ox:setActiveCharacter', async (character: Character) => {
 
   camActive = false;
   playerIsHidden = false;
-
   if (character.x) {
     await SpawnPlayer(character.x || 0, character.y || 0, character.z || 0, character.heading || 0);
   } else {
-    DoScreenFadeIn(200);
-
-    while (!IsScreenFadedIn()) await sleep(0);
+    RequestCollisionAtCoord(-1044.4243, -2748.9353, 9.7536)
+    while (!HasCollisionLoadedAroundEntity(cache.ped)) {
+      RequestCollisionAtCoord(-1044.4243, -2748.9353, 9.7536)
+      await sleep(0)
+    }
+    SetEntityCoords(cache.ped, -1044.4243, -2748.9353, 9.7536, true, false, false, false)
+    SetEntityHeading(cache.ped, 324.9973)
+    await sleep(500)
+    FreezeEntityPosition(cache.ped, false)
+    SetPlayerInvincible(cache.ped, false)
+    NetworkEndTutorialSession()
+    TaskGoToCoordAnyMeans(cache.ped, -1030.3773, -2730.0322, 13.7566, 1.0, 0, false, 786603, 0)
+    DoScreenFadeIn(1000)
+    let pedCoords = GetEntityCoords(cache.ped, false)
+    while (GetDistanceBetweenCoords(pedCoords[0], pedCoords[1], pedCoords[2], -1030.3773, -2730.0322, 13.7566, false) > 2.5){
+      await sleep(1000)
+      pedCoords = GetEntityCoords(cache.ped, false)
+    }
+    emit("ceeb_hud:switchCinematicMode", false)
+    emitNet("ceeb_globals:giveWelcomePack")
   }
 
   SetEntityHealth(cache.ped, character.health ?? GetEntityMaxHealth(cache.ped));

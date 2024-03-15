@@ -7,5 +7,5 @@ on('entityRemoved', (entityId: number) => {
 
   if (!vehicle) return;
 
-  vehicle.setStored('impound', true);
+//   vehicle.setStored('impound', true);
 });

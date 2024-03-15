@@ -22,15 +22,21 @@ addCommand<{ model: string; owner?: number }>(
     if (!ped) return;
 
     const player = args.owner ? OxPlayer.get(args.owner) : null;
+    const plate = await OxVehicle.generatePlate()
     const data = {
       model: args.model,
       owner: player?.charId || undefined,
+      properties: {
+        plate: plate
+      }
     };
 
     const vehicle = await CreateVehicle(data, GetEntityCoords(ped), GetEntityHeading(ped));
 
     if (!vehicle) return;
-
+    if (!args.owner) {
+      emit("ceeb_vehicle:key:addTempFromServer", playerId, plate)
+    }
     DeleteCurrentVehicle(ped);
     await sleep(200);
     SetPedIntoVehicle(ped, vehicle.entity, -1);

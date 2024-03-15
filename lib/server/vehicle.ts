@@ -80,7 +80,7 @@ export async function CreateVehicle(
     owner?: number;
     group?: string;
     stored?: number;
-    properties?: VehicleProperties;
+    properties?: Partial<VehicleProperties>;
   },
   coords?: number | number[] | { x: number; y: number; z: number },
   heading?: number

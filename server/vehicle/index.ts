@@ -6,7 +6,8 @@ import { DEBUG } from '../../common/config';
 import './class';
 import './commands';
 import './events';
-import { VehicleProperties } from '@overextended/ox_lib';
+import { VehicleProperties, sleep } from '@overextended/ox_lib';
+import { triggerClientCallback } from '@overextended/ox_lib/server';
 
 if (DEBUG) import('./parser');
 
@@ -18,7 +19,7 @@ export async function CreateVehicle(
         owner?: number;
         group?: string;
         stored?: string;
-        properties?: VehicleProperties;
+        properties?: Partial<VehicleProperties>;
       }),
   coords?: number | number[] | { x: number; y: number; z: number },
   heading?: number,
@@ -90,7 +91,6 @@ export async function CreateVehicle(
       data.owner || null,
       data.group || null,
       data.model,
-      vehicleData.class,
       metadata,
       data.stored || null
     );
@@ -115,9 +115,16 @@ export async function CreateVehicle(
   if (vehicle.id) vehicle.setStored(null, false);
 
   const state = vehicle.getState();
-
+  if (!metadata.label) metadata.label = `${vehicleData.name} - ${data.plate}`;
+  for (const key in metadata) {
+    if (key === 'properties') {
+        state.set('vehicleProperties', metadata.properties, true);
+    }
+    state.set(key, metadata[key], true);
+  }
+  state.set('vehicleId', vehicle.id, true);
   state.set('initVehicle', true, true);
-  state.set('vehicleProperties', metadata.properties, true);
+  SetEntityRoutingBucket(entity, metadata.instance ? metadata.instance : 0)
 
   return vehicle;
 }
@@ -132,6 +139,65 @@ export async function SpawnVehicle(id: number, coords: number | number[], headin
 
   return await CreateVehicle(vehicle, coords, heading, invokingScript);
 }
+
+setInterval(async () => {
+    for (const key of Object.keys(OxVehicle.getAll())) {
+        const vehicle = OxVehicle.get(key);
+        if (DoesEntityExist(vehicle.entity)) {
+          const ownerId = NetworkGetEntityOwner(NetworkGetEntityFromNetworkId(vehicle.netId));
+          if (ownerId && ownerId !== -1) {
+            const properties = await triggerClientCallback('ceeb_vehicle:getProperties', ownerId, vehicle.netId);
+            if (properties) vehicle.set('properties', properties);
+          }
+          const coords = GetEntityCoords(vehicle.entity);
+          const heading = GetEntityHeading(vehicle.entity);
+          vehicle.set('coords', [coords[0], coords[1], coords[2], heading]);
+        }
+    }
+}, 5000);
+
+function GetPlayersInVehicle(vehicle: number) {
+    let playersInVehicle: {id: string, seat: number}[] = []
+    const onlinePlayers = getPlayers()
+    onlinePlayers.forEach((player: string) => {
+        const playerPed = GetPlayerPed(player)
+        const playerVehicle = GetVehiclePedIsIn(playerPed, false)
+        if (playerVehicle === vehicle) {
+            for (let seat = -1; seat <= 10; seat++) {
+                if (GetPedInVehicleSeat(vehicle, seat) === playerPed) {
+                    playersInVehicle.push({ id: player, seat: seat })
+                    break
+                }
+            }
+        }
+    })
+    return playersInVehicle
+}
+
+AddStateBagChangeHandler('', '', async (bagName: string, key: string, value: any) => {
+    const entity = GetEntityFromStateBagName(bagName)
+    if (!entity) return
+    const vehicle = OxVehicle.get(entity)
+    if (!vehicle) return
+    if (key === "instance") {
+        const players = GetPlayersInVehicle(entity)
+        SetEntityRoutingBucket(entity, value)
+        while (GetEntityRoutingBucket(entity) !== value) {
+            await sleep(0);
+        }
+        for (const player of players) {
+            exports.ceeb_globals.changeInstance(player.id, value)
+            while (GetPlayerRoutingBucket(player.id) !== value) {
+                await sleep(0);
+            }
+        }
+        for (const player of players) {
+            const playerPed = GetPlayerPed(player.id)
+            TaskWarpPedIntoVehicle(playerPed, entity, player.seat)
+        }
+    }
+    vehicle.set(key, value)
+})
 
 exports('CreateVehicle', CreateVehicle);
 exports('SpawnVehicle', SpawnVehicle);

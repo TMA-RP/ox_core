@@ -1,20 +1,17 @@
-import { cache, requestAnimDict, sleep } from '@overextended/ox_lib/client';
+import { cache, requestAnimDict, sleep, notify, triggerServerCallback } from '@overextended/ox_lib/client';
 import { OxPlayer } from 'player';
-import { DEBUG } from '../../common/config';
+import { formatDistanceStrict } from "date-fns";
+import { fr } from "date-fns/locale";
 
-const hospitals = [
-  [340.5, -1396.8, 32.5, 60.1],
-  [-449.3, -340.2, 34.5, 76.2],
-  [295.6, -583.9, 43.2, 79.5],
-  [1840.1, 3670.7, 33.9, 207.6],
-  [1153.2, -1526.4, 34.8, 352.4],
-  [-244.7, 6328.3, 32.4, 242.1],
-];
+function helpNotify(message: string){
+    AddTextEntry("HelpMsg", message)
+    BeginTextCommandDisplayHelp("HelpMsg")
+    EndTextCommandDisplayHelp(0, false, false, -1)
+}
 
 const anims = [
   ['missfinale_c1@', 'lying_dead_player0'],
   ['veh@low@front_ps@idle_duck', 'sit'],
-  ['dead', 'dead_a'],
 ];
 
 let playerIsDead = false;
@@ -26,47 +23,36 @@ let playerIsDead = false;
  */
 
 async function ClearDeath(tickId: number, bleedOut: boolean) {
+  OxPlayer.state.set("isDead", false, true);
   const anim = cache.vehicle ? anims[1] : anims[0];
-  OxPlayer.state.isDead = false;
+  OxPlayer.state.set("deathTimestamp", false, true)
   playerIsDead = false;
-
   clearTick(tickId);
 
   if (bleedOut) {
-    const coords = GetEntityCoords(cache.ped, true);
-    const [x, y, z, heading] = hospitals.reduce(
-      (closest: any, hospital: any) => { //todo
-        const distance = Math.sqrt(
-          Math.pow(coords[0] - hospital[0], 2) +
-            Math.pow(coords[1] - hospital[1], 2) +
-            Math.pow(coords[2] - hospital[2], 2)
-        );
+    const [x, y, z, heading] = [315.1152, -568.4263, 48.2142, 257.3210];
 
-        if (distance < closest.distance) return { hospital, distance };
-        return closest;
-      },
-      { hospital: null, distance: 1000 }
-    ).hospital;
-
-    DoScreenFadeOut(500);
+    DoScreenFadeOut(800);
     RequestCollisionAtCoord(x, y, z);
 
-    while (!IsScreenFadedOut()) await sleep(0);
+    while (!IsScreenFadedOut()) await sleep(10);
+    await sleep(1000);
 
+    AnimpostfxStop('DeathFailOut');
     StopAnimTask(cache.ped, anim[0], anim[1], 8.0);
     SetEntityCoordsNoOffset(cache.ped, x, y, z, false, false, false);
     SetEntityHeading(cache.ped, heading);
     SetGameplayCamRelativeHeading(0);
+    emit("ceeb_job:setUnityXNerf");
 
-    await sleep(500);
 
-    DoScreenFadeIn(500);
+    DoScreenFadeIn(800);
 
-    while (!IsScreenFadedIn()) await sleep(0);
+    while (!IsScreenFadedIn()) await sleep(10);
   } else {
+    AnimpostfxStop('DeathFailOut');
     StopAnimTask(cache.ped, anim[0], anim[1], 8.0);
   }
-
   ClearPedBloodDamage(cache.ped);
   SetPlayerControl(cache.playerId, false, 0);
   SetEveryoneIgnorePlayer(cache.playerId, false);
@@ -76,33 +62,66 @@ async function ClearDeath(tickId: number, bleedOut: boolean) {
   for (let index = 0; index < anims.length; index++) RemoveAnimDict(anims[index][0]);
 }
 
-const bleedOutTime = DEBUG ? 100 : 1000;
-
 async function OnPlayerDeath() {
-  OxPlayer.state.isDead = true;
+  OxPlayer.state.set("isDead", true, true);
+//   const newTimestamp = Date.now() + 10 * 60 * 1000; // 10 minutes
+  const newTimestamp = Date.now() + 1000; // 1 second
+  const oldTimestamp = OxPlayer.state.deathTimestamp;
+  const timestamp = oldTimestamp ? oldTimestamp : newTimestamp;
+  if (!oldTimestamp) OxPlayer.state.set("deathTimestamp", newTimestamp, true); 
+  
   playerIsDead = true;
 
   for (let index = 0; index < anims.length; index++) await requestAnimDict(anims[index][0]);
 
-  ShakeGameplayCam('DEATH_FAIL_IN_EFFECT_SHAKE', 1.0);
   emit('ox_inventory:disarm');
+  AnimpostfxPlay('DeathFailOut', 0, true);
+  let hasSentDistress = false;
 
-  let bleedOut = 0;
-  const tickId = setTick(() => {
+  while (IsPedRagdoll(cache.ped)) await sleep(0);
+
+  const tickId = setTick(async() => {
     const anim = cache.vehicle ? anims[1] : anims[0];
+    const currentDate = Date.now();
 
     if (!IsEntityPlayingAnim(cache.ped, anim[0], anim[1], 3))
       TaskPlayAnim(cache.ped, anim[0], anim[1], 50.0, 8.0, -1, 1, 1.0, false, false, false);
 
     DisableFirstPersonCamThisFrame();
 
-    bleedOut++;
+    const time = Math.floor((timestamp - currentDate) / 1000);
+    if (time > 0) {
+        const formattedTime = formatDistanceStrict(timestamp, currentDate, { locale: fr });
+        if (hasSentDistress) {
+            helpNotify(`${formattedTime} avant de pouvoir appeler l'unité X`);
+        } else {
+            helpNotify(`${formattedTime} avant de pouvoir appeler l'unité X\n\n~INPUT_PICKUP~ pour envoyer un signal de détresse`);
+            if (IsControlJustReleased(0, 38)) {
+                hasSentDistress = true;
+                TriggerServerEvent("ceeb_job:sendDistress");
+            }
+        }
+    } else {
+        helpNotify("~INPUT_PICKUP~ pour être réanimé par l'unité X");
+        if (IsControlJustReleased(0, 38)) {
+            const canBeRevived = await triggerServerCallback("ceeb_job:canRevive", cache.serverId);
+            if (canBeRevived) {
+                const ambulancePlayers = await triggerServerCallback<number>("ceeb_duty:getWorkingByJob", 0, "ambulance");
+                if (ambulancePlayers! <= 100) { // @TODOCEEB change this to a real value after ambulance job players are ready to work
+                    ClearDeath(tickId, true);
+                } else {
+                    notify({ type: "error", description: "L'unité X est indisponible pour le moment" });
+                }
+            }
+        }
+    }
 
-    if (bleedOut > bleedOutTime) ClearDeath(tickId, true);
+
+    if (!OxPlayer.state.isDead) ClearDeath(tickId, false);
   });
 
   const coords = GetEntityCoords(cache.ped, true);
-  const health = Math.floor(Math.max(100, GetEntityMaxHealth(cache.ped) * 0.8));
+  const health = GetEntityMaxHealth(cache.ped) - 50;
 
   NetworkResurrectLocalPlayer(coords[0], coords[1], coords[2], GetEntityHeading(cache.ped), false, false);
 

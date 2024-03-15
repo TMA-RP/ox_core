@@ -13,6 +13,8 @@ export interface Character {
   health?: number;
   armour?: number;
   isNew?: boolean;
+  appearance: string;
+  data?: string;
 }
 
 export interface NewCharacter {
@@ -20,6 +22,7 @@ export interface NewCharacter {
   lastName: string;
   gender: string;
   date: number;
+  appearance: string;
 }
 
 export interface PlayerMetadata {
@@ -39,7 +42,7 @@ export interface CharacterLicense {
 }
 
 export type Vehicles = Dict<VehicleData>;
-export type VehicleCategories = 'air' | 'land' | 'sea';
+export type VehicleCategories = 'air' | 'land' | 'sea' | 'bicycle';
 export type TopVehicleStats = Record<VehicleCategories, VehicleStats>;
 
 export interface VehicleStats {
@@ -93,7 +96,9 @@ export type VehicleTypes =
   | 'train';
 
 export interface VehicleData extends VehicleStats {
-  class: VehicleClasses;
+  isUsedInServer: boolean;
+  isPlayerAllowed: boolean;
+  class: string;
   doors: number;
   make: string;
   name: string;

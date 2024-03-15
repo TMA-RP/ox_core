@@ -8,6 +8,7 @@ import {
   GetCharacters,
   IsStateIdAvailable,
   RemoveCharacterLicense,
+  UpdateCharacterLicense,
   SaveCharacterData,
 } from './db';
 import { getRandomChar, getRandomInt } from '@overextended/ox_lib';
@@ -266,7 +267,7 @@ export class OxPlayer extends ClassInterface {
 
   /** Increases the status's value by the given amount. */
   addStatus(statusName: string, value: number) {
-    if (!this.#statuses[statusName]) return;
+    if (!this.#statuses.hasOwnProperty(statusName)) return;
 
     this.emit('ox:setPlayerStatus', statusName, +value);
 
@@ -275,7 +276,7 @@ export class OxPlayer extends ClassInterface {
 
   /** Reduces the status's value by the given amount. */
   removeStatus(statusName: string, value: number) {
-    if (!this.#statuses[statusName]) return;
+    if (!this.#statuses.hasOwnProperty(statusName)) return;
 
     this.emit('ox:setPlayerStatus', statusName, -value);
 
@@ -334,13 +335,19 @@ export class OxPlayer extends ClassInterface {
 
   /** Returns an array of values to be saved in the database. */
   #getSaveData() {
+    const metadataToSave: {[key: string]: any;} = {};
+    for (const key in this.#metadata) {
+      if (!['isDead', 'phoneNumber', 'dateOfBirth', 'gender', 'name', 'firstName', 'lastName'].includes(key)) metadataToSave[key] = this.#metadata[key];
+    }
+    metadataToSave['deathTimestamp'] = Player(this.source).state.deathTimestamp;
     return [
       ...GetEntityCoords(this.ped),
       GetEntityHeading(this.ped),
-      Player(this.source).state.isdead || false,
+      Player(this.source).state.isDead || false,
       GetEntityHealth(this.ped),
       GetPedArmour(this.ped),
       JSON.stringify(this.#statuses || {}),
+      JSON.stringify(metadataToSave),
       this.charId,
     ];
   }
@@ -439,9 +446,11 @@ export class OxPlayer extends ClassInterface {
         data.lastName,
         data.gender,
         data.date,
-        phoneNumber
+        phoneNumber,
+        data.appearance
       ),
       isNew: true,
+      appearance: data.appearance,
     };
 
     this.#characters.push(character);
@@ -512,6 +521,17 @@ export class OxPlayer extends ClassInterface {
      */
     const state = Player(this.source).state;
     state.set('isDead', isDead === 1, true);
+
+     // Values stored in metadata and synced to client.
+     if(character.data) {
+        const cData = JSON.parse(character.data)
+        for (const key in cData) {
+            if (!['mugshot'].includes(key)) {
+                this.set(key, cData[key], true);
+                state.set(key, cData[key], true);
+            }
+        }
+    }
 
     DEV: console.info(`OxPlayer<${this.userId}> loaded character ${this.get('name')} (${this.charId})`);
 

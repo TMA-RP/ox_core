@@ -1,8 +1,16 @@
 import { ClassInterface } from 'classInterface';
 import { DeleteVehicle, IsPlateAvailable, IsVinAvailable, SaveVehicleData, SetVehicleColumn } from './db';
-import { getRandomString, getRandomAlphanumeric, getRandomChar, getRandomInt } from '@overextended/ox_lib';
+import { getRandomString, getRandomAlphanumeric, getRandomChar, getRandomInt, sleep } from '@overextended/ox_lib';
 import { PLATE_PATTERN } from '../../common/config';
 import type { Dict } from 'types';
+
+function GetPedsInVehicle(vehicle: number) {
+    let peds = []
+    for (let seat = -1; seat <= 10; seat++) {
+        peds.push(GetPedInVehicleSeat(vehicle, seat))
+    }
+    return peds
+}
 
 export class OxVehicle extends ClassInterface {
   entity: number;
@@ -57,7 +65,7 @@ export class OxVehicle extends ClassInterface {
       vehicle.model.slice(0, 2).toUpperCase(),
       null,
       null,
-      +Date() / 1000,
+      Math.floor(Date.now() / 1000),
     ];
 
     while (true) {
@@ -151,7 +159,9 @@ export class OxVehicle extends ClassInterface {
 
   #getSaveData() {
     if (!this.id) return;
-
+    const coords = GetEntityCoords(this.entity);
+    const heading = GetEntityHeading(this.entity);
+    this.set('coords', [coords[0], coords[1], coords[2], heading ]);
     return [this.#stored, JSON.stringify(this.#metadata), this.id];
   }
 
@@ -160,11 +170,20 @@ export class OxVehicle extends ClassInterface {
     return saveData && SaveVehicleData(saveData);
   }
 
-  despawn(save?: boolean) {
+  async despawn(save?: boolean) {
     const saveData = save && this.#getSaveData();
     if (saveData) SaveVehicleData(saveData);
     if (DoesEntityExist(this.entity)) DeleteEntity(this.entity);
-
+    let occupants = [];
+    if (DoesEntityExist(this.entity)) {
+        occupants = GetPedsInVehicle(this.entity);
+        occupants.forEach((ped) => TaskLeaveVehicle(ped, this.entity, 64));
+        if (this.get('stretcher')) {
+            const stretcher = NetworkGetEntityFromNetworkId(this.get('stretcher'))
+            DeleteEntity(stretcher)
+        }
+    }
+    if (occupants.length > 0) await sleep(1000);
     OxVehicle.remove(this.entity);
   }
 

@@ -27,24 +27,25 @@ export function CreateCharacter(
   lastName: string,
   gender: string,
   date: number,
-  phoneNumber?: number
+  phoneNumber?: number,
+  appearance?: string
 ) {
   return db.insert(
-    'INSERT INTO characters (userId, stateId, firstName, lastName, gender, dateOfBirth, phoneNumber) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [userId, stateId, firstName, lastName, gender, new Date(date), phoneNumber]
+    'INSERT INTO characters (userId, stateId, firstName, lastName, gender, dateOfBirth, phoneNumber, appearance) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    [userId, stateId, firstName, lastName, gender, new Date(date), phoneNumber, appearance]
   );
 }
 
 export function GetCharacters(userId: number) {
   return db.execute<Character>(
-    'SELECT charId, stateId, firstName, lastName, x, y, z, heading, DATE_FORMAT(lastPlayed, "%d/%m/%Y") AS lastPlayed FROM characters WHERE userId = ? AND deleted IS NULL LIMIT ?',
+    'SELECT charId, stateId, appearance, firstName, lastName, x, y, z, heading, DATE_FORMAT(lastPlayed, "%d/%m/%Y") AS lastPlayed, data FROM characters WHERE userId = ? AND deleted IS NULL LIMIT ?',
     [userId, CHARACTER_SLOTS]
   );
 }
 
 export function SaveCharacterData(values: any[] | any[][], batch?: boolean) {
   const query =
-    'UPDATE characters SET x = ?, y = ?, z = ?, heading = ?, isDead = ?, lastPlayed = CURRENT_DATE(), health = ?, armour = ?, statuses = ? WHERE charId = ?';
+    'UPDATE characters SET x = ?, y = ?, z = ?, heading = ?, isDead = ?, lastPlayed = CURRENT_DATE(), health = ?, armour = ?, statuses = ?, data = ? WHERE charId = ?';
 
   return batch ? db.batch(query, values) : db.update(query, values);
 }

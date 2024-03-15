@@ -2,22 +2,7 @@ import { cache, notify, onServerCallback, requestModel } from '@overextended/ox_
 import { GetTopVehicleStats, GetVehicleData } from '../../common/vehicles';
 import { VehicleData, VehicleTypes, VehicleStats, VehicleCategories } from 'types';
 
-const vehiclePriceModifiers = {
-  automobile: 1600,
-  bicycle: 150,
-  bike: 500,
-  boat: 6000,
-  heli: 90000,
-  plane: 16000,
-  quadbike: 600,
-  train: 6000,
-  submarinecar: 18000,
-  submarine: 17200,
-  blimp: 12000,
-  trailer: 10000,
-};
-
-onServerCallback('ox:generateVehicleData', async (parseAll: boolean) => {
+onServerCallback('ox:generateVehicleData', async (parseAll: boolean, playerVehicles: any, vehiclePrices: any) => {
   const coords = GetEntityCoords(cache.ped, true);
   const vehicles: Record<string, VehicleData> = {} as any;
   const vehicleModels: string[] = GetAllVehicleModels()
@@ -55,7 +40,7 @@ onServerCallback('ox:generateVehicleData', async (parseAll: boolean) => {
     }
 
     SetPedIntoVehicle(cache.ped, entity, -1);
-    const vehicleClass = GetVehicleClass(entity);
+    const vehicleClass = exports.ceeb_admincommands.calculateVehicleClass(model, entity);
     let vehicleType: VehicleTypes;
 
     if (IsThisModelACar(hash)) vehicleType = 'automobile';
@@ -80,6 +65,8 @@ onServerCallback('ox:generateVehicleData', async (parseAll: boolean) => {
     };
 
     const data: VehicleData = {
+      isUsedInServer: vehiclePrices[model] ? true : false,
+      isPlayerAllowed: playerVehicles[model] ? true : false,
       acceleration: stats.acceleration,
       braking: stats.braking,
       handling: stats.handling,
@@ -94,7 +81,7 @@ onServerCallback('ox:generateVehicleData', async (parseAll: boolean) => {
       price: 0,
     };
 
-    console.log(index, model, `^3| ${data.make} ${data.name}^0`);
+    console.log(index, vehicleModels.length, model, `^3| ${data.make} ${data.name}^0`);
 
     const weapons = DoesVehicleHaveWeapons(entity);
 
@@ -107,6 +94,8 @@ onServerCallback('ox:generateVehicleData', async (parseAll: boolean) => {
         vehicleCategory = 'air';
       } else if (vehicleType === 'boat' || vehicleType === 'submarine') {
         vehicleCategory = 'sea';
+      } else if (vehicleType === 'bicycle') {
+        vehicleCategory = 'bicycle';
       } else {
         vehicleCategory = 'land';
       }
@@ -118,23 +107,15 @@ onServerCallback('ox:generateVehicleData', async (parseAll: boolean) => {
       }
     }
 
-    let price = stats.braking + stats.acceleration + stats.handling + stats.speed;
-
-    if (GetVehicleHasKers(entity)) price *= 2;
-    if (GetHasRocketBoost(entity)) price *= 3;
-    if (GetCanVehicleJump(entity)) price *= 1.5;
-    if (GetVehicleHasParachute(entity)) price *= 1.5;
-    if (data.weapons) price *= 5;
+    let price = vehiclePrices[model] ? vehiclePrices[model] : 0
 
     if (IsThisModelAnAmphibiousCar(hash)) {
       data.type = 'amphibious_automobile';
-      price *= 4;
     } else if (IsThisModelAnAmphibiousQuadbike(hash)) {
       data.type = 'amphibious_quadbike';
-      price *= 4;
     }
 
-    data.price = Math.floor(price * vehiclePriceModifiers[vehicleType]);
+    data.price = Math.floor(price);
     vehicles[model] = data;
     parsed++;
 

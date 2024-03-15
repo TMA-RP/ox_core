@@ -67,7 +67,7 @@ AddStateBagChangeHandler('vehicleProperties', '', async (bagName: string, key: s
     return DEBUG && console.info(`Cannot set ${key} - player does not own ${bagName}`);
 
   const vehicleState = Entity(entity).state;
-
+  SetVehRadioStation(entity, 'OFF')
   setVehicleProperties(entity, value);
 
   setTimeout(() => vehicleState.set(key, null, true));

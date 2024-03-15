@@ -1,6 +1,7 @@
 import { addCommand, triggerClientCallback } from '@overextended/ox_lib/server';
 import { GetTopVehicleStats, GetVehicleData } from '../../common/vehicles';
 import { VehicleData, TopVehicleStats } from 'types';
+import { db } from '../db';
 
 function SortObjectProperties(obj: object) {
   return Object.fromEntries(Object.entries(obj).sort());
@@ -9,10 +10,18 @@ function SortObjectProperties(obj: object) {
 addCommand<{ parseAll: boolean }>(
   'parsevehicles',
   async (playerId, args) => {
+    const vehicles = await db.query<{ model: string; price: number }>('SELECT model, price FROM vehicleshop_vehicles');
+    let vehiclePrices: Record<string, number> = {};
+    vehicles.forEach((vehicle: any) => (vehiclePrices[vehicle.model] = vehicle.price));
+    const playerVehicles = await db.query<{ model: string }>('SELECT model FROM vehicleshop_vehicles WHERE job IS NULL');
+    let playerVehicleList: Record<string, boolean> = {};
+    playerVehicles.forEach((vehicle: any) => (playerVehicleList[vehicle.model] = true));
     const response: [Record<string, VehicleData>, TopVehicleStats] | void = await triggerClientCallback(
       'ox:generateVehicleData',
       playerId,
-      args.parseAll
+      args.parseAll,
+      playerVehicleList,
+      vehiclePrices,
     );
 
     if (!response) return;
