@@ -1,7 +1,7 @@
 {
   "name": "@overextended/ox_core",
   "author": "Overextended",
-  "version": "0.21.4",
+  "version": "0.23.0",
   "license": "LGPL-3.0-or-later",
   "description": "A modern FiveM framework.",
   "type": "module",
@@ -41,6 +41,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@nativewrappers/fivem": "^0.0.5",
     "@overextended/ox_lib": "^3.16.3",
     "date-fns": "^3.3.1",
     "mariadb": "^3.2.3"

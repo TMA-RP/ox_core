@@ -8,6 +8,7 @@ import './commands';
 import './events';
 import { VehicleProperties, sleep } from '@overextended/ox_lib';
 import { triggerClientCallback } from '@overextended/ox_lib/server';
+import { VectorFromBuffer } from '../../common';
 
 if (DEBUG) import('./parser');
 
@@ -21,7 +22,7 @@ export async function CreateVehicle(
         stored?: string;
         properties?: Partial<VehicleProperties>;
       }),
-  coords?: number | number[] | { x: number; y: number; z: number },
+  coords?: number | number[] | { x: number; y: number; z: number } | { buffer: any },
   heading?: number,
   invokingScript = GetInvokingResource()
 ) {
@@ -69,7 +70,9 @@ export async function CreateVehicle(
   }
 
   if (typeof coords === 'number') coords = GetEntityCoords(coords);
-  else if (typeof coords === 'object' && !Array.isArray(coords)) coords = [coords.x || 0, coords.y || 0, coords.z || 0];
+  else if (typeof coords === 'object' && !Array.isArray(coords)) {
+    coords = 'buffer' in coords ? VectorFromBuffer(coords) : [coords.x || 0, coords.y || 0, coords.z || 0];
+  }
 
   const entity = coords
     ? CreateVehicleServerSetter(data.model, networkType, coords[0], coords[1], coords[2], heading || 90)
@@ -81,7 +84,7 @@ export async function CreateVehicle(
 
   data.plate = data.plate && (await IsPlateAvailable(data.plate)) ? data.plate : await OxVehicle.generatePlate();
 
-  const metadata = data.data || {} as { properties: VehicleProperties; [key: string]: any };
+  const metadata = data.data || ({} as { properties: VehicleProperties; [key: string]: any });
   metadata.properties = metadata.properties || data.properties;
 
   if (!data.id && data.vin) {

@@ -1,4 +1,5 @@
 import { cache, requestAnimDict, sleep, notify, triggerServerCallback } from '@overextended/ox_lib/client';
+import { Vector3, Vector4 } from '@nativewrappers/fivem';
 import { OxPlayer } from 'player';
 import { formatDistanceStrict } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -30,18 +31,18 @@ async function ClearDeath(tickId: number, bleedOut: boolean) {
   clearTick(tickId);
 
   if (bleedOut) {
-    const [x, y, z, heading] = [315.1152, -568.4263, 48.2142, 257.3210];
+    const hospital = Vector4.fromArray([315.1152, -568.4263, 48.2142, 257.3210]);
 
     DoScreenFadeOut(800);
-    RequestCollisionAtCoord(x, y, z);
+    RequestCollisionAtCoord(hospital.x, hospital.y, hospital.z);
 
     while (!IsScreenFadedOut()) await sleep(10);
     await sleep(1000);
 
     AnimpostfxStop('DeathFailOut');
     StopAnimTask(cache.ped, anim[0], anim[1], 8.0);
-    SetEntityCoordsNoOffset(cache.ped, x, y, z, false, false, false);
-    SetEntityHeading(cache.ped, heading);
+    SetEntityCoordsNoOffset(cache.ped, hospital.x, hospital.y, hospital.z, false, false, false);
+    SetEntityHeading(cache.ped, hospital.w);
     SetGameplayCamRelativeHeading(0);
     emit("ceeb_job:setUnityXNerf");
 
@@ -64,8 +65,7 @@ async function ClearDeath(tickId: number, bleedOut: boolean) {
 
 async function OnPlayerDeath() {
   OxPlayer.state.set("isDead", true, true);
-//   const newTimestamp = Date.now() + 10 * 60 * 1000; // 10 minutes
-  const newTimestamp = Date.now() + 1000; // 1 second
+  const newTimestamp = Date.now() + 10 * 60 * 1000; // 10 minutes
   const oldTimestamp = OxPlayer.state.deathTimestamp;
   const timestamp = oldTimestamp ? oldTimestamp : newTimestamp;
   if (!oldTimestamp) OxPlayer.state.set("deathTimestamp", newTimestamp, true); 
