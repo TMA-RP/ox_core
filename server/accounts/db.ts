@@ -15,7 +15,7 @@ export async function UpdateBalance(id: number, amount: number, action: 'add' | 
       id,
       amount,
     ])) === 1 &&
-    (await db.insert(addTransaction, [action === 'add' ? null : id, action === 'add' ? id : null, amount, message ?? locales("no_message")])) === 1
+    (await db.insert(addTransaction, [action === 'add' ? null : id, action === 'add' ? id : null, amount, message])) === 1
   );
 }
 
@@ -30,7 +30,7 @@ export async function PerformTransaction(fromId: number, toId: number, amount: n
     const b = (await conn.execute(addBalance, [amount, toId])).affectedRows === 1;
 
     if (a && b) {
-      await conn.execute(addTransaction, [fromId, toId, amount, message ?? locales("no_message")]);
+      await conn.execute(addTransaction, [fromId, toId, amount, message]);
       await conn.commit();
       return true;
     }
@@ -117,7 +117,7 @@ export async function DepositMoney(playerId: number, accountId: number, amount: 
     return false;
   }
 
-  await conn.execute(addTransaction, [null, accountId, amount, locales("deposit")]);
+  await conn.execute(addTransaction, [null, accountId, amount, locales('deposit')]);
   conn.commit();
   return true;
 }
@@ -142,7 +142,7 @@ export async function WithdrawMoney(playerId: number, accountId: number, amount:
     return false;
   }
 
-  await conn.execute(addTransaction, [accountId, null, amount, locales("withdraw")]);
+  await conn.execute(addTransaction, [accountId, null, amount, locales('withdraw')]);
   conn.commit();
   return true;
 }
