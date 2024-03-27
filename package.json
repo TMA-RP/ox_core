@@ -43,6 +43,7 @@
   "dependencies": {
     "@nativewrappers/fivem": "^0.0.28",
     "@overextended/ox_lib": "^3.18.0",
+    "date-fns": "^3.6.0",
     "mariadb": "^3.3.0"
   },
   "engines": {
