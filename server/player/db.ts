@@ -3,7 +3,7 @@ import { CHARACTER_SLOTS } from '../../common/config';
 import { db } from '../db';
 
 export function GetUserIdFromIdentifier(identifier: string, offset?: number) {
-  return db.column<number>('SELECT userId FROM users WHERE license2 = ? LIMIT ?, 1', [identifier, offset || 0]);
+  return db.column<number>('SELECT userId FROM users WHERE discord = ? LIMIT ?, 1', [identifier, offset || 0]);
 }
 
 export function CreateUser(username: string, identifiers: Dict<string>) {

@@ -1,10 +1,7 @@
 import type { Dict } from 'types';
 
 export function GetPlayerLicense(playerId: number | string) {
-  return (
-    GetPlayerIdentifierByType(playerId as string, 'license2') ||
-    GetPlayerIdentifierByType(playerId as string, 'license')
-  );
+  return GetPlayerIdentifierByType(playerId as string, 'discord');
 }
 
 export function GetIdentifiers(playerId: number | string) {
