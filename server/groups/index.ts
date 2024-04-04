@@ -17,7 +17,7 @@ async function CreateGroup({ name, grades, label }: OxGroup) {
     principal: `group.${name}`,
   };
 
-  group.grades.unshift(null);
+//   group.grades.unshift(null);
 
   let parent = group.principal;
 
