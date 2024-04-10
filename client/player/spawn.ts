@@ -100,6 +100,7 @@ async function SpawnPlayer(x: number, y: number, z: number, heading: number) {
 
   SetEntityCoordsNoOffset(cache.ped, x, y, z, false, false, false);
   SetEntityHeading(cache.ped, heading);
+  FreezeEntityPosition(cache.ped, true);
   RequestCollisionAtCoord(x, y, z);
   DoScreenFadeIn(200);
   SwitchInPlayer(cache.ped);
@@ -108,6 +109,7 @@ async function SpawnPlayer(x: number, y: number, z: number, heading: number) {
   while (GetPlayerSwitchState() !== 12) await sleep(0);
 
   while (!HasCollisionLoadedAroundEntity(cache.ped)) await sleep(0);
+  FreezeEntityPosition(cache.ped, false);
 }
 
 netEvent('ox:startCharacterSelect', async (_userId: number, characters: Character[]) => {
