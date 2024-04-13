@@ -1,52 +1,52 @@
 {
-  "name": "@overextended/ox_core",
-  "author": "Overextended",
-  "version": "0.24.0",
-  "license": "LGPL-3.0-or-later",
-  "description": "A modern FiveM framework.",
-  "type": "module",
-  "files": [
-    "./tsconfig.json",
-    "./package/**/*.js",
-    "./package/**/*.d.ts"
-  ],
-  "exports": {
-    ".": "./package/lib/index.js",
-    "./client": "./package/lib/client/index.js",
-    "./server": "./package/lib/server/index.js"
-  },
-  "scripts": {
-    "prepare": "tsc --build && tsc-alias",
-    "build": "node build.js --mode=production",
-    "watch": "node build.js"
-  },
-  "keywords": [
-    "fivem",
-    "ox_core",
-    "ox",
-    "overextended"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/overextended/ox_core.git"
-  },
-  "bugs": "https://github.com/overextended/ox_core/issues",
-  "devDependencies": {
-    "@citizenfx/client": "latest",
-    "@citizenfx/server": "latest",
-    "@types/node": "^20.11.30",
-    "esbuild": "^0.19.12",
-    "prettier": "^3.2.5",
-    "tsc-alias": "^1.8.8",
-    "typescript": "^5.4.3"
-  },
-  "dependencies": {
-    "@nativewrappers/fivem": "^0.0.28",
-    "@overextended/ox_lib": "^3.18.0",
-    "date-fns": "^3.6.0",
-    "mariadb": "^3.3.0"
-  },
-  "engines": {
-    "node": ">=16.9.1"
-  }
+    "name": "@overextended/ox_core",
+    "author": "Overextended",
+    "version": "0.24.0",
+    "license": "LGPL-3.0-or-later",
+    "description": "A modern FiveM framework.",
+    "type": "module",
+    "files": [
+        "./tsconfig.json",
+        "./package/**/*.js",
+        "./package/**/*.d.ts"
+    ],
+    "exports": {
+        ".": "./package/lib/index.js",
+        "./client": "./package/lib/client/index.js",
+        "./server": "./package/lib/server/index.js"
+    },
+    "scripts": {
+        "prepare": "tsc --build && tsc-alias",
+        "build": "node build.js --mode=production",
+        "watch": "node build.js"
+    },
+    "keywords": [
+        "fivem",
+        "ox_core",
+        "ox",
+        "overextended"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/overextended/ox_core.git"
+    },
+    "bugs": "https://github.com/overextended/ox_core/issues",
+    "devDependencies": {
+        "@citizenfx/client": "latest",
+        "@citizenfx/server": "latest",
+        "@types/node": "^20.12.7",
+        "esbuild": "^0.20.2",
+        "prettier": "^3.2.5",
+        "tsc-alias": "^1.8.8",
+        "typescript": "^5.4.5"
+    },
+    "dependencies": {
+        "@nativewrappers/fivem": "^0.0.28",
+        "date-fns": "^3.6.0",
+        "@overextended/ox_lib": "^3.19.2",
+        "mariadb": "^3.3.0"
+    },
+    "engines": {
+        "node": ">=16.9.1"
+    }
 }
