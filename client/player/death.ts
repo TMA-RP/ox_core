@@ -84,8 +84,10 @@ async function OnPlayerDeath() {
     const anim = cache.vehicle ? anims[1] : anims[0];
     const currentDate = Date.now();
 
-    if (!IsEntityPlayingAnim(cache.ped, anim[0], anim[1], 3))
-      TaskPlayAnim(cache.ped, anim[0], anim[1], 50.0, 8.0, -1, 1, 1.0, false, false, false);
+    if (!IsEntityPlayingAnim(cache.ped, anim[0], anim[1], 3)){
+        TaskPlayAnim(cache.ped, anim[0], anim[1], 50.0, 8.0, -1, 1, 1.0, false, false, false);
+        RemoveAnimDict(anim[0])
+    }
 
     DisableFirstPersonCamThisFrame();
 
