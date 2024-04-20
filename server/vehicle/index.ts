@@ -82,10 +82,23 @@ export async function CreateVehicle(
   if (!data.vin && (data.owner || data.group)) data.vin = await OxVehicle.generateVin(vehicleData);
   if (data.vin && !data.owner && !data.group) delete data.vin;
 
-  data.plate = data.plate && (await IsPlateAvailable(data.plate)) ? data.plate : await OxVehicle.generatePlate();
+  let plateChanged = false;
+  if (!data.plate || data.plate && (data.owner || data.group)) {
+    if (data.plate && (await IsPlateAvailable(data.plate))) {
+        data.plate = data.plate;
+    } else {
+        data.plate = await OxVehicle.generatePlate();
+        plateChanged = true;
+    }
+  } else {
+    data.plate = data.plate;
+  }
 
   const metadata = data.data || ({} as { properties: VehicleProperties; [key: string]: any });
   metadata.properties = metadata.properties || data.properties;
+  metadata.properties = metadata.properties || {};
+  metadata.properties.plate = plateChanged ? data.plate : metadata.properties.plate;
+  if (!metadata.label) metadata.label = `${vehicleData.name} - ${data.plate}`;
 
   if (!data.id && data.vin) {
     data.id = await CreateNewVehicle(
@@ -118,7 +131,6 @@ export async function CreateVehicle(
   if (vehicle.id) vehicle.setStored(null, false);
 
   const state = vehicle.getState();
-  if (!metadata.label) metadata.label = `${vehicleData.name} - ${data.plate}`;
   for (const key in metadata) {
     if (key === 'properties') {
         state.set('vehicleProperties', metadata.properties, true);

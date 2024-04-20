@@ -26,9 +26,7 @@ addCommand<{ model: string; owner?: number }>(
     const data = {
       model: args.model,
       owner: player?.charId || undefined,
-      properties: {
-        plate: plate
-      }
+      plate: plate
     };
 
     const vehicle = await CreateVehicle(data, GetEntityCoords(ped), GetEntityHeading(ped));
@@ -38,8 +36,10 @@ addCommand<{ model: string; owner?: number }>(
       emit("ceeb_vehicle:key:addTempFromServer", playerId, plate)
     }
     DeleteCurrentVehicle(ped);
-    await sleep(200);
-    SetPedIntoVehicle(ped, vehicle.entity, -1);
+    while (GetPedInVehicleSeat(vehicle.entity, -1) !== ped){
+        TaskWarpPedIntoVehicle(ped, vehicle.entity, -1);
+        await sleep(100);
+    } 
   },
   {
     help: `Spawn a vehicle with the given model.`,
