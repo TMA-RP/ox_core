@@ -72,19 +72,16 @@ async function OnPlayerDeath() {
   
   playerIsDead = true;
 
-  for (let index = 0; index < anims.length; index++) await requestAnimDict(anims[index][0]);
-
   emit('ox_inventory:disarm');
   AnimpostfxPlay('DeathFailOut', 0, true);
   let hasSentDistress = false;
-
-  while (IsPedRagdoll(cache.ped)) await sleep(0);
 
   const tickId = setTick(async() => {
     const anim = cache.vehicle ? anims[1] : anims[0];
     const currentDate = Date.now();
 
     if (!IsEntityPlayingAnim(cache.ped, anim[0], anim[1], 3)){
+        await requestAnimDict(anim[0]);
         TaskPlayAnim(cache.ped, anim[0], anim[1], 50.0, 8.0, -1, 1, 1.0, false, false, false);
         RemoveAnimDict(anim[0])
     }
@@ -124,6 +121,8 @@ async function OnPlayerDeath() {
 
   const coords = GetEntityCoords(cache.ped, true);
   const health = GetEntityMaxHealth(cache.ped) - 50;
+
+  while (IsPedRagdoll(cache.ped)) await sleep(0);
 
   NetworkResurrectLocalPlayer(coords[0], coords[1], coords[2], GetEntityHeading(cache.ped), false, false);
 
