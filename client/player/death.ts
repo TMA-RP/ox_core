@@ -137,6 +137,6 @@ on('ox:playerLoaded', () => {
   const id: CitizenTimer = setInterval(() => {
     if (!OxPlayer.isLoaded) return clearInterval(id);
 
-    if (!playerIsDead && IsPedDeadOrDying(cache.ped, true)) OnPlayerDeath();
+    if (!playerIsDead && IsEntityDead(cache.ped)) OnPlayerDeath();
   }, 200);
 });
