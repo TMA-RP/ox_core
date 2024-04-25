@@ -9,8 +9,8 @@ dependencies:
     specifier: ^0.0.28
     version: 0.0.28
   '@overextended/ox_lib':
-    specifier: ^3.19.2
-    version: 3.19.2
+    specifier: ^3.20.0
+    version: 3.20.0
   date-fns:
     specifier: ^3.6.0
     version: 3.6.0
@@ -287,8 +287,8 @@ packages:
       fastq: 1.17.1
     dev: true
 
-  /@overextended/ox_lib@3.19.2:
-    resolution: {integrity: sha512-g2NrOJFgQoFo9MKakIlR3g64a9DbRAALT+FVYf8YGwLQf2m6zC1UtCVGmmVpYU6YPIbSoNu+BKcMsZFcfGVFVg==}
+  /@overextended/ox_lib@3.20.0:
+    resolution: {integrity: sha512-wIx1M2eMUs5OspL+EDR5CHzfclDL5XP5usCLpas1fBFKPoF5UBB+WkNHSZ5i49huOfi6caVpLiU5Mmkc1Z92VA==}
     dependencies:
       '@nativewrappers/client': 1.7.33
       csstype: 3.1.3

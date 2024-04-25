@@ -1,14 +1,10 @@
-import { CHARACTER_SLOTS, DEFAULT_SPAWN } from 'config';
 import { sleep } from '@overextended/ox_lib';
-import {
-  cache,
-} from '@overextended/ox_lib/client';
+import { cache, inputDialog } from '@overextended/ox_lib/client';
 import { OxPlayer } from './';
 import { netEvent } from 'utils';
-import { Character } from 'types';
-
-let playerIsHidden = false;
-let camActive = false;
+import { CHARACTER_SELECT, SPAWN_LOCATION } from 'config';
+import locale from '../../common/locales';
+import type { Character, NewCharacter } from 'types';
 
 DoScreenFadeOut(0);
 NetworkStartSoloTutorialSession();
@@ -30,12 +26,10 @@ async function StartSession() {
   SetPlayerControl(cache.playerId, false, 0);
   SetPlayerInvincible(cache.playerId, true);
 
-  while (!OxPlayer.isLoaded || playerIsHidden) {
+  while (!OxPlayer.isLoaded) {
     DisableAllControlActions(0);
     ThefeedHideThisFrame();
     HideHudAndRadarThisFrame();
-
-    if (playerIsHidden) SetLocalPlayerInvisibleLocally(true);
 
     await sleep(0);
   }
@@ -49,123 +43,119 @@ async function StartSession() {
   emit("ceeb_hud:display", true)
 }
 
-async function StartCharacterSelect(characters: Character[]) {
-  while (!IsScreenFadedOut()) {
-    DoScreenFadeOut(0);
-    await sleep(0);
-  }
-
-  SetEntityCoordsNoOffset(cache.ped, DEFAULT_SPAWN[0], DEFAULT_SPAWN[1], DEFAULT_SPAWN[2] - 1.0, true, true, false);
-  StartPlayerTeleport(
-    cache.playerId,
-    DEFAULT_SPAWN[0],
-    DEFAULT_SPAWN[1],
-    DEFAULT_SPAWN[2] - 1.0,
-    DEFAULT_SPAWN[3],
-    false,
-    true,
-    false
-  );
-
-  while (!UpdatePlayerTeleport(cache.playerId)) await sleep(0);
-
-  camActive = true;
-  const cam = CreateCameraWithParams(
-    "DEFAULT_SCRIPTED_CAMERA", 
-    2151.5132, 
-    2921.0088, 
-    -60.9020, 
-    266.2535, 
-    0.00, 
-    0.00, 
-    40.00, 
-    false, 
-    0);
-
-  SetCamActive(cam, true);
-  RenderScriptCams(true, false, 0, true, true);
-  PointCamAtCoord(cam, DEFAULT_SPAWN[0], DEFAULT_SPAWN[1], DEFAULT_SPAWN[2]);
-  emit("ceeb_multichar:receiveChars", characters, CHARACTER_SLOTS)
-
-  while (camActive) await sleep(0);
-
-  RenderScriptCams(false, false, 0, true, true);
-  DestroyCam(cam, false);
-}
-
-async function SpawnPlayer(x: number, y: number, z: number, heading: number) {
-  SwitchOutPlayer(cache.ped, 0, 1);
-
-  while (GetPlayerSwitchState() !== 5) await sleep(0);
-
-  SetEntityCoordsNoOffset(cache.ped, x, y, z, false, false, false);
-  SetEntityHeading(cache.ped, heading);
-  FreezeEntityPosition(cache.ped, true);
-  RequestCollisionAtCoord(x, y, z);
-  DoScreenFadeIn(200);
-  SwitchInPlayer(cache.ped);
-  SetGameplayCamRelativeHeading(0);
-
-  while (GetPlayerSwitchState() !== 12) await sleep(0);
-
-  while (!HasCollisionLoadedAroundEntity(cache.ped)) await sleep(0);
-  FreezeEntityPosition(cache.ped, false);
-}
-
 netEvent('ox:startCharacterSelect', async (_userId: number, characters: Character[]) => {
   if (OxPlayer.isLoaded) {
-    DEV: console.info('Character is already loaded - resetting data');
     OxPlayer.isLoaded = false;
+
     emit('ox:playerLogout');
   }
 
-//   playerIsHidden = true;
   StartSession();
-  StartCharacterSelect(characters);
 
-  while (IsScreenFadedOut()) await sleep(0);
+  const character = characters[0];
+  const [x, y, z] = [
+    character?.x || SPAWN_LOCATION[0],
+    character?.y || SPAWN_LOCATION[1],
+    character?.z || SPAWN_LOCATION[2],
+  ];
+  const heading = character?.heading || 90;
+
+  RequestCollisionAtCoord(x, y, z);
+  FreezeEntityPosition(cache.ped, true);
+  SetEntityCoordsNoOffset(cache.ped, x, y, z, true, true, false);
+  SetEntityHeading(cache.ped, heading);
+
+  if (!CHARACTER_SELECT) return;
+
+  SwitchOutPlayer(cache.ped, 1, 1);
+
+  while (GetPlayerSwitchState() !== 5) await sleep(0);
+
+  DoScreenFadeIn(200);
+
+  if (character) {
+    return emitNet('ox:setActiveCharacter', character.charId);
+  }
+
+  const input = await inputDialog(
+    locale('create_character'),
+    [
+      {
+        type: 'input',
+        required: true,
+        icon: 'user-pen',
+        label: locale('firstname'),
+        placeholder: 'John',
+      },
+      {
+        type: 'input',
+        required: true,
+        icon: 'user-pen',
+        label: locale('lastname'),
+        placeholder: 'Smith',
+      },
+      {
+        type: 'select',
+        required: true,
+        icon: 'circle-user',
+        label: locale('gender'),
+        options: [
+          {
+            label: locale('male'),
+            value: 'male',
+          },
+          {
+            label: locale('female'),
+            value: 'female',
+          },
+          {
+            label: locale('non_binary'),
+            value: 'non_binary',
+          },
+        ],
+      },
+      {
+        type: 'date',
+        required: true,
+        icon: 'calendar-days',
+        label: locale('date_of_birth'),
+        format: 'YYYY-MM-DD',
+        min: '1900-01-01',
+        max: '2006-01-01',
+        default: '2006-01-01',
+      },
+    ],
+    {
+      allowCancel: false,
+    }
+  );
+
+  if (!input) return;
+
+  emitNet('ox:setActiveCharacter', <NewCharacter>{
+    firstName: input[0] as string,
+    lastName: input[1] as string,
+    gender: input[2] as string,
+    date: input[3] as number,
+  });
 });
 
 netEvent('ox:setActiveCharacter', async (character: Character) => {
-  if (!character.isNew) {
-    DoScreenFadeOut(300);
+  await sleep(100); //todo: solve race-condition with illenium-appearance :(
 
-    while (!IsScreenFadedOut()) await sleep(0);
+  if (CHARACTER_SELECT) {
+    SwitchInPlayer(cache.ped);
+    SetGameplayCamRelativeHeading(0);
   }
 
-  camActive = false;
-  playerIsHidden = false;
-  if (character.x) {
-    await SpawnPlayer(character.x || 0, character.y || 0, character.z || 0, character.heading || 0);
-  } else {
-    RequestCollisionAtCoord(-1044.4243, -2748.9353, 9.7536)
-    while (!HasCollisionLoadedAroundEntity(cache.ped)) {
-      RequestCollisionAtCoord(-1044.4243, -2748.9353, 9.7536)
-      await sleep(0)
-    }
-    SetEntityCoords(cache.ped, -1044.4243, -2748.9353, 9.7536, true, false, false, false)
-    SetEntityHeading(cache.ped, 324.9973)
-    await sleep(500)
-    FreezeEntityPosition(cache.ped, false)
-    SetPlayerInvincible(cache.ped, false)
-    NetworkEndTutorialSession()
-    TaskGoToCoordAnyMeans(cache.ped, -1030.3773, -2730.0322, 13.7566, 1.0, 0, false, 786603, 0)
-    DoScreenFadeIn(1000)
-    let pedCoords = GetEntityCoords(cache.ped, false)
-    while (GetDistanceBetweenCoords(pedCoords[0], pedCoords[1], pedCoords[2], -1030.3773, -2730.0322, 13.7566, false) > 2.5){
-      await sleep(1000)
-      pedCoords = GetEntityCoords(cache.ped, false)
-    }
-    emit("ceeb_hud:switchCinematicMode", false)
-    emitNet("ceeb_globals:giveWelcomePack")
-  }
+  while (!IsScreenFadedIn() || ![0, 12].includes(GetPlayerSwitchState())) await sleep(0);
 
   SetEntityHealth(cache.ped, character.health ?? GetEntityMaxHealth(cache.ped));
   SetPedArmour(cache.ped, character.armour ?? 0);
-
-  DEV: console.info(`Loaded as ${character.firstName} ${character.lastName}`);
+  FreezeEntityPosition(cache.ped, false);
 
   OxPlayer.isLoaded = true;
+
   emit('playerSpawned');
   emit('ox:playerLoaded', OxPlayer, character.isNew);
 });
