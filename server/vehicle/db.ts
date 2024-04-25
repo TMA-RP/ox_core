@@ -8,7 +8,7 @@ export type VehicleRow = {
   plate: string;
   vin: string;
   model: string;
-  data: { properties: VehicleProperties; [key: string]: any };
+  data: { properties?: VehicleProperties; [key: string]: any };
 };
 
 // setImmediate(() => db.query('UPDATE vehicles SET `stored` = ? WHERE `stored` IS NULL', ['impound']));

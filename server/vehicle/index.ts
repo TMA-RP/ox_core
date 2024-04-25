@@ -95,8 +95,7 @@ export async function CreateVehicle(
   }
 
   const metadata = data.data || ({} as { properties: VehicleProperties; [key: string]: any });
-  metadata.properties = metadata.properties || data.properties;
-  metadata.properties = metadata.properties || {};
+  metadata.properties = metadata.properties ? metadata.properties : data.properties ? data.properties : {};
   metadata.properties.plate = plateChanged ? data.plate : metadata.properties.plate;
   if (!metadata.label) metadata.label = `${vehicleData.name} - ${data.plate}`;
 

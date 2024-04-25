@@ -23,11 +23,18 @@ addCommand<{ model: string; owner?: number }>(
 
     const player = args.owner ? OxPlayer.get(args.owner) : null;
     const plate = await OxVehicle.generatePlate()
-    const data = {
+    let data: any = {
       model: args.model,
       owner: player?.charId || undefined,
-      plate: plate
+      plate: plate,
     };
+
+    if(!args.owner) {
+        data.data = {
+            isOpen: true,
+            adminCar: true
+        }
+    }
 
     const vehicle = await CreateVehicle(data, GetEntityCoords(ped), GetEntityHeading(ped));
 
