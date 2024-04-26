@@ -109,6 +109,7 @@ export class OxVehicle extends ClassInterface {
 
     if (parameters.length > 0) {
       SaveVehicleData(parameters, true);
+      console.log(`[^2INFO^7] Saved ^5${parameters.length}^7 vehicles to the database.`)
       emit('ox:savedVehicles', parameters.length);
     }
   }
