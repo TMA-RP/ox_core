@@ -174,10 +174,10 @@ setInterval(async () => {
  * @todo Consider performance on servers with a high vehicle-count.
  * Multiple staggered saves may improve load.
  */
-setInterval(() => OxVehicle.saveAll(), 600000);
+setInterval(() => OxVehicle.saveAll(undefined, false), 600000);
 
 on('txAdmin:events:serverShuttingDown', () => {
-    OxVehicle.saveAll();
+    OxVehicle.saveAll(undefined, true);
 });
 
 function GetPlayersInVehicle(vehicle: number) {

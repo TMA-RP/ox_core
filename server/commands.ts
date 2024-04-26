@@ -6,7 +6,7 @@ addCommand(
   'saveall',
   async () => {
     OxPlayer.saveAll();
-    OxVehicle.saveAll();
+    OxVehicle.saveAll(undefined, false);
   },
   {
     help: 'Saves all players and vehicles to the database.',

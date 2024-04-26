@@ -88,7 +88,7 @@ export class OxVehicle extends ClassInterface {
     }
   }
 
-  static saveAll(resource?: string) {
+  static saveAll(resource?: string, despawn?: boolean) {
     if (resource === 'ox_core') resource = '';
 
     const parameters = [];
@@ -101,7 +101,7 @@ export class OxVehicle extends ClassInterface {
           parameters.push(vehicle.#getSaveData());
         }
 
-        vehicle.despawn();
+        if (despawn) vehicle.despawn();
       }
     }
 
