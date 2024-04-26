@@ -21,9 +21,9 @@ export async function IsVinAvailable(plate: string) {
   return !(await db.exists('SELECT 1 FROM vehicles WHERE vin = ?', [plate]));
 }
 
-export function GetStoredVehicleFromId(id: number) {
+export function GetVehicleFromId(id: number) {
   return db.row<VehicleRow>(
-    'SELECT id, owner, `group`, plate, vin, model, data FROM vehicles WHERE id = ? AND `stored` IS NOT NULL',
+    'SELECT id, owner, `group`, plate, vin, model, data, stored FROM vehicles WHERE id = ?',
     [id]
   );
 }

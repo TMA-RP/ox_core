@@ -1,5 +1,5 @@
 import { OxVehicle } from './class';
-import { CreateNewVehicle, GetStoredVehicleFromId, IsPlateAvailable, VehicleRow } from './db';
+import { CreateNewVehicle, GetVehicleFromId, IsPlateAvailable, VehicleRow } from './db';
 import { GetVehicleData } from '../../common/vehicles';
 import { DEBUG } from '../../common/config';
 
@@ -127,7 +127,7 @@ export async function CreateVehicle(
     data.group
   );
 
-  if (vehicle.id) vehicle.setStored(null, false);
+  if (vehicle.id && !data.stored?.startsWith("property_")) vehicle.setStored(null, false);
 
   const state = vehicle.getState();
   for (const key in metadata) {
@@ -138,14 +138,13 @@ export async function CreateVehicle(
   }
   state.set('vehicleId', vehicle.id, true);
   state.set('initVehicle', true, true);
-  SetEntityRoutingBucket(entity, metadata.instance ? metadata.instance : 0)
 
   return vehicle;
 }
 
 export async function SpawnVehicle(id: number, coords: number | number[], heading?: number) {
   const invokingScript = GetInvokingResource();
-  const vehicle = await GetStoredVehicleFromId(id);
+  const vehicle = await GetVehicleFromId(id);
 
   if (!vehicle) return;
 
@@ -169,6 +168,17 @@ setInterval(async () => {
         }
     }
 }, 5000);
+
+/**
+ * Sets an interval to save every 10 minutes.
+ * @todo Consider performance on servers with a high vehicle-count.
+ * Multiple staggered saves may improve load.
+ */
+setInterval(() => OxVehicle.saveAll(), 600000);
+
+on('txAdmin:events:serverShuttingDown', () => {
+    OxVehicle.saveAll();
+});
 
 function GetPlayersInVehicle(vehicle: number) {
     let playersInVehicle: {id: string, seat: number}[] = []

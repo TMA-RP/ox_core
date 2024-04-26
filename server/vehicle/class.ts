@@ -98,7 +98,6 @@ export class OxVehicle extends ClassInterface {
 
       if (!resource || resource === vehicle.script) {
         if (vehicle.owner || vehicle.group) {
-          vehicle.#stored = 'impound';
           parameters.push(vehicle.#getSaveData());
         }
 
@@ -162,9 +161,6 @@ export class OxVehicle extends ClassInterface {
 
   #getSaveData() {
     if (!this.id) return;
-    const coords = GetEntityCoords(this.entity);
-    const heading = GetEntityHeading(this.entity);
-    this.set('coords', [coords[0], coords[1], coords[2], heading ]);
     return [this.#stored, JSON.stringify(this.#metadata), this.id];
   }
 
