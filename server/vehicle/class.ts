@@ -105,7 +105,7 @@ export class OxVehicle extends ClassInterface {
       }
     }
 
-    DEV: console.info(`Saving ${parameters.length} vehicles to the database.`);
+    DEV: console.info(`Saved ${parameters.length} vehicle${parameters.length > 1 ? "s" : ""} to the database.`);
 
     if (parameters.length > 0) {
       SaveVehicleData(parameters, true);

@@ -4,4 +4,5 @@ import 'player';
 import 'utils';
 import 'accounts';
 import 'vehicle';
-import 'commands';
+import './commands';
+import './events';
