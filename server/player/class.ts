@@ -6,6 +6,7 @@ import {
   GetCharacterLicenses,
   GetCharacterMetadata,
   GetCharacters,
+  GetMaxCharacters,
   IsStateIdAvailable,
   RemoveCharacterLicense,
   SaveCharacterData,
@@ -389,13 +390,18 @@ export class OxPlayer extends ClassInterface {
     }
 
     Player(this.source).state.set('userId', this.userId, true);
-    this.emit('ox:startCharacterSelect', this.userId, await this.#getCharacters());
+    this.emit('ox:startCharacterSelect', this.userId, await this.#getCharacters(), await this.#getMaxCharacters());
   }
 
   /** Returns an array of all characters owned by the player, excluding soft-deleted characters. */
   async #getCharacters() {
     this.#characters = await GetCharacters(this.userId);
     return this.#characters;
+  }
+
+  async #getMaxCharacters() {
+    const maxChars = await GetMaxCharacters(this.userId);
+    return maxChars;
   }
 
   /** Clears data for the active character. If the player is still connected then transition them to character selection. */

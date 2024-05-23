@@ -43,6 +43,10 @@ export function GetCharacters(userId: number) {
   );
 }
 
+export function GetMaxCharacters(userId: number) {
+    return db.column<number>('SELECT maxChars FROM users WHERE userId = ?', [userId]);
+}
+
 export function SaveCharacterData(values: any[] | any[][], batch?: boolean) {
   const query =
     'UPDATE characters SET x = ?, y = ?, z = ?, heading = ?, isDead = ?, lastPlayed = CURRENT_DATE(), health = ?, armour = ?, statuses = ?, data = ? WHERE charId = ?';
