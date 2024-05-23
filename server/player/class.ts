@@ -139,6 +139,7 @@ export class OxPlayer extends ClassInterface {
     this.#metadata[key] = value;
 
     if (replicated) this.emit('ox:setPlayerData', key, value);
+    if (key === 'mugshot') this.save();
   }
 
   /** Gets a value stored in active character's metadata. */
