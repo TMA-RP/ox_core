@@ -38,7 +38,7 @@ export function CreateCharacter(
 
 export function GetCharacters(userId: number) {
   return db.execute<Character>(
-    'SELECT charId, stateId, appearance, firstName, lastName, x, y, z, heading, DATE_FORMAT(lastPlayed, "%d/%m/%Y") AS lastPlayed, data FROM characters WHERE userId = ? AND deleted IS NULL LIMIT ?',
+    'SELECT charId, stateId, appearance, tattoos, firstName, lastName, x, y, z, heading, DATE_FORMAT(lastPlayed, "%d/%m/%Y") AS lastPlayed, data FROM characters WHERE userId = ? AND deleted IS NULL LIMIT ?',
     [userId, CHARACTER_SLOTS]
   );
 }
