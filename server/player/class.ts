@@ -418,7 +418,7 @@ export class OxPlayer extends ClassInterface {
     //@ts-ignore
     delete this.charId;
 
-    this.emit('ox:startCharacterSelect', this.userId, await this.#getCharacters());
+    this.emit('ox:startCharacterSelect', this.userId, await this.#getCharacters(), await this.#getMaxCharacters());
   }
 
   /** Creates a stateId for a newly created character. */
