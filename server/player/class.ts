@@ -10,7 +10,7 @@ import {
   IsStateIdAvailable,
   RemoveCharacterLicense,
   SaveCharacterData,
-  UpdateCharacterLicense
+  UpdateCharacterLicense,
 } from './db';
 import { getRandomChar, getRandomInt } from '@overextended/ox_lib';
 import { GetGroup } from 'groups';
@@ -382,14 +382,14 @@ export class OxPlayer extends ClassInterface {
   }
 
   /** Adds the player to the player registry and starts character selection. */
-  async setAsJoined(newId?: number | string) {
-    if (newId) {
-      delete OxPlayer.members[this.source];
-      this.source = +newId;
-      OxPlayer.members[this.source] = this;
+  async setAsJoined() {
+    if (!OxPlayer.getFromUserId(this.userId)) {
+      OxPlayer.add(this.source, this);
+      Player(this.source).state.set('userId', this.userId, true);
     }
 
-    Player(this.source).state.set('userId', this.userId, true);
+    DEV: console.info(`Starting character selection for OxPlayer<${this.userId}>`);
+
     this.emit('ox:startCharacterSelect', this.userId, await this.#getCharacters(), await this.#getMaxCharacters());
   }
 
