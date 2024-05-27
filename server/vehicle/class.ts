@@ -182,7 +182,7 @@ export class OxVehicle extends ClassInterface {
             DeleteEntity(stretcher)
         }
     }
-    if (occupants.length > 0) await sleep(1000);
+    if (occupants.length > 0) await sleep(1500);
     if (DoesEntityExist(this.entity)) DeleteEntity(this.entity);
     OxVehicle.remove(this.entity);
   }
