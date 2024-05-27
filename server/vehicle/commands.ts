@@ -75,10 +75,9 @@ addCommand<{ radius?: number; owned?: string }>(
     if (!vehicles) return;
 
     vehicles.forEach((netId) => {
-      const vehicle = OxVehicle.getFromNetId(netId);
+      const vehicle = OxVehicle.get(NetworkGetEntityFromNetworkId(netId));
 
-      if (!vehicle) DeleteEntity(NetworkGetEntityFromNetworkId(netId));
-      else if (args.owned) vehicle.setStored('impound', true);
+      vehicle ? vehicle.setStored('impound', true) : DeleteEntity(vehicle);
     });
   },
   {

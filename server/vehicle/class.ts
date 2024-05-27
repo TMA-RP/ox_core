@@ -173,7 +173,6 @@ export class OxVehicle extends ClassInterface {
   async despawn(save?: boolean) {
     const saveData = save && this.#getSaveData();
     if (saveData) SaveVehicleData(saveData);
-    if (DoesEntityExist(this.entity)) DeleteEntity(this.entity);
     let occupants = [];
     if (DoesEntityExist(this.entity)) {
         occupants = GetPedsInVehicle(this.entity);
@@ -184,6 +183,7 @@ export class OxVehicle extends ClassInterface {
         }
     }
     if (occupants.length > 0) await sleep(1000);
+    if (DoesEntityExist(this.entity)) DeleteEntity(this.entity);
     OxVehicle.remove(this.entity);
   }
 
