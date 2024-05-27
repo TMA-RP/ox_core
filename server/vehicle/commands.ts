@@ -35,18 +35,12 @@ addCommand<{ model: string; owner?: number }>(
             adminCar: true
         }
     }
-
+    
     const vehicle = await CreateVehicle(data, GetEntityCoords(ped), GetEntityHeading(ped));
 
     if (!vehicle) return;
-    if (!args.owner) {
-      emit("ceeb_vehicle:key:addTempFromServer", playerId, plate)
-    }
-    DeleteCurrentVehicle(ped);
-    while (GetPedInVehicleSeat(vehicle.entity, -1) !== ped){
-        TaskWarpPedIntoVehicle(ped, vehicle.entity, -1);
-        await sleep(100);
-    } 
+    if (!args.owner) emit("ceeb_vehicle:key:addTempFromServer", playerId, plate)
+    emitNet("ox_core:vehicle:enter", playerId, vehicle.netId)
   },
   {
     help: `Spawn a vehicle with the given model.`,

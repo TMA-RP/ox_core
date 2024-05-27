@@ -1,4 +1,4 @@
-import { cache, onServerCallback, setVehicleProperties, waitFor } from '@overextended/ox_lib/client';
+import { cache, onServerCallback, setVehicleProperties, waitFor, sleep } from '@overextended/ox_lib/client';
 import { Vector3 } from '@nativewrappers/fivem';
 import { DEBUG } from '../config';
 
@@ -61,4 +61,12 @@ AddStateBagChangeHandler('vehicleProperties', '', async (bagName: string, key: s
   if (setVehicleProperties(entity, value)) {
     setTimeout(() => Entity(entity).state.set(key, null, true));
   }
+});
+
+onNet('ox_core:vehicle:enter', async (netId: number) => {
+    while(!NetworkGetEntityFromNetworkId(netId)) await sleep(0);
+    const vehicle = NetworkGetEntityFromNetworkId(netId);
+    console.debug("ICI CONNARD2", netId)
+    while (!DoesEntityExist(vehicle)) await sleep(0);
+    TaskWarpPedIntoVehicle(cache.ped, vehicle, -1);
 });
