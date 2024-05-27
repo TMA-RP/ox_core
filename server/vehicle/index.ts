@@ -83,7 +83,7 @@ export async function CreateVehicle(
   if (data.vin && !data.owner && !data.group) delete data.vin;
 
   let plateChanged = false;
-  if (!data.plate || data.plate && (data.owner || data.group)) {
+  if (!data.plate || data.id && data.plate && (data.owner || data.group)) {
     if (data.plate && (await IsPlateAvailable(data.plate))) {
         data.plate = data.plate;
     } else {
