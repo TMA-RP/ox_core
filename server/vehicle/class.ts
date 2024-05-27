@@ -8,7 +8,8 @@ import { GetVehicleData } from '../../common/vehicles';
 function GetPedsInVehicle(vehicle: number) {
     let peds = []
     for (let seat = -1; seat <= 10; seat++) {
-        peds.push(GetPedInVehicleSeat(vehicle, seat))
+        const pedInSeat = GetPedInVehicleSeat(vehicle, seat)
+        if (pedInSeat !== 0) peds.push(pedInSeat)
     }
     return peds
 }
@@ -173,7 +174,7 @@ export class OxVehicle extends ClassInterface {
   async despawn(save?: boolean) {
     const saveData = save && this.#getSaveData();
     if (saveData) SaveVehicleData(saveData);
-    let occupants = [];
+    let occupants: number[] = [];
     if (DoesEntityExist(this.entity)) {
         occupants = GetPedsInVehicle(this.entity);
         occupants.forEach((ped) => TaskLeaveVehicle(ped, this.entity, 64));
