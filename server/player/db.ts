@@ -1,5 +1,4 @@
 import type { Character, Dict, OxStatus, CharacterLicense } from 'types';
-import { CHARACTER_SLOTS } from '../../common/config';
 import { db } from '../db';
 
 export function GetUserIdFromIdentifier(identifier: string, offset?: number) {
@@ -38,8 +37,8 @@ export function CreateCharacter(
 
 export function GetCharacters(userId: number) {
   return db.execute<Character>(
-    'SELECT charId, stateId, appearance, tattoos, firstName, lastName, x, y, z, heading, DATE_FORMAT(lastPlayed, "%d/%m/%Y") AS lastPlayed, data FROM characters WHERE userId = ? AND deleted IS NULL LIMIT ?',
-    [userId, CHARACTER_SLOTS]
+    'SELECT charId, stateId, appearance, tattoos, firstName, lastName, x, y, z, heading, DATE_FORMAT(lastPlayed, "%d/%m/%Y") AS lastPlayed, data FROM characters WHERE userId = ? AND deleted IS NULL',
+    [userId]
   );
 }
 
