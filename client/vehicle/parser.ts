@@ -82,7 +82,7 @@ onServerCallback('ox:generateVehicleData', async (parseAll: boolean, playerVehic
         vehicleCategory = 'air';
       } else if (vehicleType === 'boat' || vehicleType === 'submarine') {
         vehicleCategory = 'sea';
-      } else if (vehicleType === 'bicycle') {
+      } else if (IsThisModelABicycle(hash)) {
         vehicleCategory = 'bicycle';
       } else {
         vehicleCategory = 'land';
@@ -104,8 +104,8 @@ onServerCallback('ox:generateVehicleData', async (parseAll: boolean, playerVehic
     }
 
     data.price = Math.floor(price);
-    vehicles[model] = data;
     parsed++;
+    vehicles[model] = data;
 
     SetVehicleAsNoLongerNeeded(entity);
     SetModelAsNoLongerNeeded(hash);

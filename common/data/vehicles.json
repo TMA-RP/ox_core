@@ -31,22 +31,6 @@
     "type": "automobile",
     "price": 0
   },
-  "2vd_buffalo4h": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
-    "acceleration": 0.3555,
-    "braking": 0.95,
-    "handling": 0.7355,
-    "speed": 49.3729,
-    "traction": 2.58,
-    "name": "NULL",
-    "make": "NULL",
-    "class": "A",
-    "seats": 4,
-    "doors": 6,
-    "type": "automobile",
-    "price": 0
-  },
   "2vd_cypher": {
     "isUsedInServer": false,
     "isPlayerAllowed": false,
@@ -125,22 +109,6 @@
     "seats": 4,
     "doors": 5,
     "type": "automobile",
-    "price": 0
-  },
-  "2vd_supervolito": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
-    "acceleration": 5.635,
-    "braking": 3.4919,
-    "handling": 5.635,
-    "speed": 61.9686,
-    "traction": 1.3,
-    "name": "SuperVolito",
-    "make": "NULL",
-    "class": "B",
-    "seats": 4,
-    "doors": 4,
-    "type": "heli",
     "price": 0
   },
   "2vd_vcaracara": {
@@ -644,7 +612,7 @@
     "class": "X",
     "seats": 4,
     "doors": 4,
-    "type": "trailer",
+    "type": "submarine",
     "price": 740890
   },
   "b412": {
@@ -808,8 +776,8 @@
     "price": 53640
   },
   "baller8": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.295,
     "braking": 0.9225,
     "handling": 0.675,
@@ -821,7 +789,7 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 47700
   },
   "banshee": {
     "isUsedInServer": false,
@@ -1173,7 +1141,7 @@
     "class": "B",
     "seats": 1,
     "doors": 0,
-    "type": "quadbike",
+    "type": "automobile",
     "price": 11300
   },
   "blazer2": {
@@ -1189,7 +1157,7 @@
     "class": "D",
     "seats": 1,
     "doors": 0,
-    "type": "quadbike",
+    "type": "automobile",
     "price": 0
   },
   "blazer3": {
@@ -1205,7 +1173,7 @@
     "class": "B",
     "seats": 1,
     "doors": 0,
-    "type": "quadbike",
+    "type": "automobile",
     "price": 17450
   },
   "blazer4": {
@@ -1221,7 +1189,7 @@
     "class": "B",
     "seats": 1,
     "doors": 0,
-    "type": "quadbike",
+    "type": "automobile",
     "price": 26400
   },
   "blazer5": {
@@ -1254,7 +1222,7 @@
     "class": "B",
     "seats": 4,
     "doors": 4,
-    "type": "trailer",
+    "type": "heli",
     "price": 0
   },
   "blimp2": {
@@ -1270,7 +1238,7 @@
     "class": "B",
     "seats": 4,
     "doors": 4,
-    "type": "trailer",
+    "type": "heli",
     "price": 0
   },
   "blimp3": {
@@ -1286,7 +1254,7 @@
     "class": "B",
     "seats": 4,
     "doors": 4,
-    "type": "trailer",
+    "type": "heli",
     "price": 0
   },
   "blista": {
@@ -1350,7 +1318,7 @@
     "class": "V",
     "seats": 1,
     "doors": 1,
-    "type": "bicycle",
+    "type": "bike",
     "price": 150
   },
   "boattrailer": {
@@ -2575,7 +2543,7 @@
     "class": "B",
     "seats": 1,
     "doors": 0,
-    "type": "quadbike",
+    "type": "automobile",
     "price": 27800
   },
   "chino": {
@@ -3040,7 +3008,7 @@
     "class": "V",
     "seats": 1,
     "doors": 1,
-    "type": "bicycle",
+    "type": "bike",
     "price": 180
   },
   "crusader": {
@@ -3752,8 +3720,8 @@
     "price": 45800
   },
   "drifteuros": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.711,
     "braking": 0.85,
     "handling": 1.091,
@@ -3765,7 +3733,7 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 44850
   },
   "driftfr36": {
     "isUsedInServer": false,
@@ -4313,8 +4281,8 @@
     "price": 8500
   },
   "euros": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.324,
     "braking": 0.9,
     "handling": 0.704,
@@ -4326,7 +4294,7 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 44850
   },
   "everon": {
     "isUsedInServer": true,
@@ -4662,7 +4630,7 @@
     "class": "V",
     "seats": 1,
     "doors": 1,
-    "type": "bicycle",
+    "type": "bike",
     "price": 220
   },
   "flashgt": {
@@ -5707,7 +5675,7 @@
     "class": "D",
     "seats": 1,
     "doors": 0,
-    "type": "quadbike",
+    "type": "automobile",
     "price": 0
   },
   "ignus": {
@@ -5899,7 +5867,7 @@
     "class": "V",
     "seats": 1,
     "doors": 1,
-    "type": "bicycle",
+    "type": "bike",
     "price": 450
   },
   "inductor2": {
@@ -5915,7 +5883,7 @@
     "class": "V",
     "seats": 1,
     "doors": 1,
-    "type": "bicycle",
+    "type": "bike",
     "price": 0
   },
   "infernus": {
@@ -6574,7 +6542,7 @@
     "class": "X",
     "seats": 1,
     "doors": 3,
-    "type": "trailer",
+    "type": "submarine",
     "price": 0,
     "weapons": true
   },
@@ -9603,7 +9571,7 @@
     "class": "A",
     "seats": 1,
     "doors": 0,
-    "type": "quadbike",
+    "type": "automobile",
     "price": 0
   },
   "rt3000": {
@@ -10165,7 +10133,7 @@
     "class": "V",
     "seats": 1,
     "doors": 1,
-    "type": "bicycle",
+    "type": "bike",
     "price": 270
   },
   "scramjet": {
@@ -11129,7 +11097,7 @@
     "class": "A",
     "seats": 2,
     "doors": 0,
-    "type": "quadbike",
+    "type": "automobile",
     "price": 26300
   },
   "stunt": {
@@ -11161,7 +11129,7 @@
     "class": "X",
     "seats": 1,
     "doors": 1,
-    "type": "trailer",
+    "type": "submarine",
     "price": 450874
   },
   "submersible2": {
@@ -11177,7 +11145,7 @@
     "class": "X",
     "seats": 1,
     "doors": 1,
-    "type": "trailer",
+    "type": "submarine",
     "price": 385412
   },
   "sugoi": {
@@ -12529,7 +12497,7 @@
     "class": "V",
     "seats": 1,
     "doors": 1,
-    "type": "bicycle",
+    "type": "bike",
     "price": 300
   },
   "tribike2": {
@@ -12545,7 +12513,7 @@
     "class": "V",
     "seats": 1,
     "doors": 1,
-    "type": "bicycle",
+    "type": "bike",
     "price": 300
   },
   "tribike3": {
@@ -12561,7 +12529,7 @@
     "class": "V",
     "seats": 1,
     "doors": 1,
-    "type": "bicycle",
+    "type": "bike",
     "price": 300
   },
   "trophytruck": {
@@ -13060,7 +13028,7 @@
     "class": "D",
     "seats": 2,
     "doors": 0,
-    "type": "quadbike",
+    "type": "automobile",
     "price": 10200
   },
   "vestra": {
