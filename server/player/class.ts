@@ -20,6 +20,7 @@ import { addPrincipal, removePrincipal } from '@overextended/ox_lib/server';
 import { AddCharacterGroup, GetCharacterGroups, RemoveCharacterGroup, UpdateCharacterGroup } from 'groups/db';
 import { GetCharacterAccount, GetCharacterAccounts } from 'accounts';
 import type { Character, Dict, NewCharacter, PlayerMetadata, OxGroup, CharacterLicense } from 'types';
+import { GetGroupPermissions } from '../../common';
 
 export class OxPlayer extends ClassInterface {
   source: number | string;
@@ -243,9 +244,31 @@ export class OxPlayer extends ClassInterface {
     return this.#groups;
   }
 
+  hasPermission(permission: string): boolean {
+    const matchResult = permission.match(/^group\.([^.]+)\.(.*)/);
+    const groupName = matchResult?.[1];
+    permission = matchResult?.[2] ?? permission;
+
+    if (groupName) {
+      const grade = this.#groups[groupName];
+
+      if (!grade) return false;
+
+      const permissions = GetGroupPermissions(groupName);
+
+      for (let g = grade; g > 0; g--) {
+        const value = permissions[g] && permissions[g][permission];
+
+        if (value !== undefined) return value;
+      }
+    }
+
+    return false;
+  }
+
   /** Sets the value of a status. */
   setStatus(statusName: string, value = Statuses[statusName].default) {
-    if (!Statuses[statusName]) return;
+    if (Statuses[statusName] === undefined) return;
 
     if (value > 100) value = 100;
     else if (value < 0) value = 0;
@@ -269,7 +292,7 @@ export class OxPlayer extends ClassInterface {
 
   /** Increases the status's value by the given amount. */
   addStatus(statusName: string, value: number) {
-    if (!this.#statuses.hasOwnProperty(statusName)) return;
+    if (this.#statuses[statusName] === undefined) return;
 
     this.emit('ox:setPlayerStatus', statusName, +value);
 
@@ -278,7 +301,7 @@ export class OxPlayer extends ClassInterface {
 
   /** Reduces the status's value by the given amount. */
   removeStatus(statusName: string, value: number) {
-    if (!this.#statuses.hasOwnProperty(statusName)) return;
+    if (this.#statuses[statusName] === undefined) return;
 
     this.emit('ox:setPlayerStatus', statusName, -value);
 

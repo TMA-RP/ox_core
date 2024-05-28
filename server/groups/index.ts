@@ -1,7 +1,9 @@
-import { addAce, addCommand, addPrincipal, removeAce, removePrincipal } from '@overextended/ox_lib/server';
+import { addAce, addCommand, addPrincipal, locale, removeAce, removePrincipal } from '@overextended/ox_lib/server';
 import { SelectGroups } from './db';
 import { OxPlayer } from 'player/class';
-import { Dict, OxGroup } from 'types';
+import type { Dict, OxGroup } from 'types';
+import type { GroupsTable } from './db';
+import { GetGroupPermissions } from '../../common';
 
 const groups: Dict<OxGroup> = {};
 
@@ -9,19 +11,52 @@ export function GetGroup(name: string) {
   return groups[name];
 }
 
-async function CreateGroup({ name, grades, label }: OxGroup) {
+export function SetGroupPermission(groupName: string, grade: number, permission: string, value: 'allow' | 'deny') {
+  const permissions = GetGroupPermissions(groupName);
+
+  if (!permissions[grade]) permissions[grade] = {};
+
+  permissions[grade][permission] = value === 'allow' ? true : false;
+  GlobalState[`group.${groupName}:permissions`] = permissions;
+}
+
+export function RemoveGroupPermission(groupName: string, grade: number, permission: string) {
+  const permissions = GetGroupPermissions(groupName);
+
+  if (!permissions[grade]) return;
+
+  delete permissions[grade][permission];
+  GlobalState[`group.${groupName}:permissions`] = permissions;
+}
+
+async function CreateGroup({ name, grades, colour }: GroupsTable) {
   const group: OxGroup = {
     name,
-    label,
-    grades: JSON.parse(grades as any),
+    colour,
+    label: locale(`groups.${name}.name`),
     principal: `group.${name}`,
+    grades: [],
   };
 
-//   group.grades.unshift(null);
+  for (let index = 0; index < grades; index++) {
+    group.grades[index] = locale(`groups.${name}.grades.${index}`);
+  }
+
+  GlobalState[group.principal] = group;
+  GlobalState[`${group.name}:count`] = 0;
+
+  groups[name] = group;
+  group.grades = group.grades.reduce(
+    (acc, value, index) => {
+      acc[index + 1] = value;
+      return acc;
+    },
+    {} as Record<number, string>
+  ) as any;
 
   let parent = group.principal;
 
-  for (let i = 0; i < group.grades.length; i++) {
+  for (const i in group.grades) {
     const child = `${group.principal}:${i}`;
 
     if (!IsPrincipalAceAllowed(child, child)) {
@@ -32,10 +67,6 @@ async function CreateGroup({ name, grades, label }: OxGroup) {
     parent = child;
   }
 
-  groups[name] = group;
-  GlobalState[group.principal] = group;
-  GlobalState[`${group.name}:count`] = 0;
-
   DEV: console.info(`Instantiated OxGroup<${group.name}>`);
 }
 
@@ -45,7 +76,7 @@ function DeleteGroup(group: OxGroup) {
 
   removeAce(parent, parent, true);
 
-  for (let i = 0; i < group.grades.length; i++) {
+  for (const i in group.grades) {
     const child = `${group.principal}:${i}`;
 
     removeAce(child, child, true);
@@ -93,3 +124,6 @@ addCommand<{ target: string; group: string; grade?: number }>(
     ],
   }
 );
+
+exports('SetGroupPermission', SetGroupPermission);
+exports('RemoveGroupPermission', RemoveGroupPermission)

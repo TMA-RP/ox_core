@@ -40,21 +40,9 @@ onServerCallback('ox:generateVehicleData', async (parseAll: boolean, playerVehic
     }
 
     SetPedIntoVehicle(cache.ped, entity, -1);
-    const vehicleClass = exports.ceeb_admincommands.calculateVehicleClass(model, entity);
-    let vehicleType: VehicleTypes;
 
-    if (IsThisModelACar(hash)) vehicleType = 'automobile';
-    else if (IsThisModelABicycle(hash)) vehicleType = 'bicycle';
-    else if (IsThisModelABike(hash)) vehicleType = 'bike';
-    else if (IsThisModelABoat(hash)) vehicleType = 'boat';
-    else if (IsThisModelAHeli(hash)) vehicleType = 'heli';
-    else if (IsThisModelAPlane(hash)) vehicleType = 'plane';
-    else if (IsThisModelAQuadbike(hash)) vehicleType = 'quadbike';
-    else if (IsThisModelATrain(hash)) vehicleType = 'train';
-    else if (vehicleClass === 5) vehicleType = 'submarinecar';
-    else if (vehicleClass === 14) vehicleType = 'submarine';
-    else if (vehicleClass === 16) vehicleType = 'blimp';
-    else vehicleType = 'trailer';
+    const vehicleClass = exports.ceeb_admincommands.calculateVehicleClass(model, entity);
+    const vehicleType = GetVehicleType(entity) as VehicleTypes;
 
     const stats: VehicleStats = {
       acceleration: parseFloat(GetVehicleModelAcceleration(hash).toFixed(4)),

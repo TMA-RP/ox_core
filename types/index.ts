@@ -128,6 +128,11 @@ export interface OxAccount {
 export interface OxGroup {
   name: string;
   label: string;
-  grades: [null, ...string[]];
+  grades: string[];
   principal: string;
+  colour?: number;
+}
+
+export interface OxGroupPermissions {
+  [grade: string]: { [permission: string]: boolean };
 }

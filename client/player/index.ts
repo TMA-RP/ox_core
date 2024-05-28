@@ -1,5 +1,6 @@
 import { netEvent } from 'utils';
 import type { Character, Dict, OxStatus } from 'types';
+import { GetGroupPermissions } from '../../common';
 
 export const Statuses: Dict<OxStatus> = {};
 const callableMethods: Dict<true> = {};
@@ -118,24 +119,46 @@ export const OxPlayer = new (class PlayerSingleton {
   }
 
   setStatus(name: string, value: number) {
-    if (!this.#statuses[name]) return false;
+    if (this.#statuses[name] === undefined) return false;
 
     this.#statuses[name] = value;
     return true;
   }
 
   addStatus(name: string, value: number) {
-    if (!this.#statuses[name]) return false;
+    if (this.#statuses[name] === undefined) return false;
 
     this.#statuses[name] += value;
     return true;
   }
 
   removeStatus(name: string, value: number) {
-    if (!this.#statuses[name]) return false;
+    if (this.#statuses[name] === undefined) return false;
 
     this.#statuses[name] -= value;
     return true;
+  }
+
+  hasPermission(permission: string): boolean {
+    const matchResult = permission.match(/^group\.([^.]+)\.(.*)/);
+    const groupName = matchResult?.[1];
+    permission = matchResult?.[2] ?? permission;
+
+    if (groupName) {
+      const grade = this.#groups[groupName];
+
+      if (!grade) return false;
+
+      const permissions = GetGroupPermissions(groupName);
+
+      for (let g = grade; g > 0; g--) {
+        const value = permissions[g] && permissions[g][permission];
+
+        if (value !== undefined) return value;
+      }
+    }
+
+    return false;
   }
 })();
 
