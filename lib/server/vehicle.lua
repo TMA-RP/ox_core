@@ -29,7 +29,7 @@ function OxVehicle:__call(...)
 end
 
 function OxVehicle:__tostring()
-    return json.encode(self, { indent = true })
+    return json.encode(self, { indent = true})
 end
 
 function OxVehicle:getCoords()
