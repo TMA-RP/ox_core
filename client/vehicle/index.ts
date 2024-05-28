@@ -60,7 +60,6 @@ AddStateBagChangeHandler('vehicleProperties', '', async (bagName: string, key: s
 onNet('ox_core:vehicle:enter', async (netId: number) => {
     while(!NetworkGetEntityFromNetworkId(netId)) await sleep(0);
     const vehicle = NetworkGetEntityFromNetworkId(netId);
-    console.debug("ICI CONNARD2", netId)
     while (!DoesEntityExist(vehicle)) await sleep(0);
     TaskWarpPedIntoVehicle(cache.ped, vehicle, -1);
 });
