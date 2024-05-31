@@ -468,8 +468,8 @@
     "price": 9460
   },
   "asterope2": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.238,
     "braking": 0.9,
     "handling": 0.618,
@@ -481,7 +481,7 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 24000
   },
   "astron": {
     "isUsedInServer": true,
@@ -623,7 +623,7 @@
     "handling": 5.635,
     "speed": 61.9686,
     "traction": 1.3,
-    "name": "NULL",
+    "name": "B412",
     "make": "NULL",
     "class": "B",
     "seats": 4,
@@ -1900,8 +1900,8 @@
     "price": 39400
   },
   "buffalo5": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.382,
     "braking": 0.985,
     "handling": 0.842,
@@ -1913,7 +1913,7 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 70450
   },
   "bulldozer": {
     "isUsedInServer": false,
@@ -2383,8 +2383,8 @@
     "price": 25300
   },
   "cavalcade3": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.2765,
     "braking": 0.875,
     "handling": 0.6565,
@@ -2396,7 +2396,7 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 43300
   },
   "cerberus": {
     "isUsedInServer": false,
@@ -3147,7 +3147,7 @@
     "handling": 0.53,
     "speed": 35.4017,
     "traction": 1.9,
-    "name": "NULL",
+    "name": "Cabby",
     "make": "",
     "class": "D",
     "seats": 4,
@@ -3640,8 +3640,8 @@
     "price": 0
   },
   "dominator9": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.3448,
     "braking": 0.93,
     "handling": 0.7248,
@@ -3653,11 +3653,11 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 47760
   },
   "dorado": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.2168,
     "braking": 0.5,
     "handling": 0.5968,
@@ -3669,7 +3669,7 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 26200
   },
   "double": {
     "isUsedInServer": true,
@@ -3736,8 +3736,8 @@
     "price": 44850
   },
   "driftfr36": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.7125,
     "braking": 0.765,
     "handling": 1.0925,
@@ -3749,11 +3749,11 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 31450
   },
   "driftfuto": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.71,
     "braking": 0.765,
     "handling": 1.09,
@@ -3765,7 +3765,7 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 41250
   },
   "driftjester": {
     "isUsedInServer": false,
@@ -3784,8 +3784,8 @@
     "price": 0
   },
   "driftremus": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.712,
     "braking": 0.87,
     "handling": 1.092,
@@ -3797,11 +3797,11 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 24800
   },
   "drifttampa": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.712,
     "braking": 0.8,
     "handling": 1.092,
@@ -3813,11 +3813,11 @@
     "seats": 2,
     "doors": 3,
     "type": "automobile",
-    "price": 0
+    "price": 75410
   },
   "driftyosemite": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.718,
     "braking": 0.82,
     "handling": 1.098,
@@ -3829,11 +3829,11 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 37500
   },
   "driftzr350": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.708,
     "braking": 0.85,
     "handling": 1.088,
@@ -3845,7 +3845,7 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 42620
   },
   "dubsta": {
     "isUsedInServer": true,
@@ -4102,7 +4102,7 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 59600
+    "price": 65600
   },
   "ellie": {
     "isUsedInServer": true,
@@ -4746,8 +4746,8 @@
     "price": 25740
   },
   "fr36": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.301,
     "braking": 0.86,
     "handling": 0.681,
@@ -4759,7 +4759,7 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 21400
   },
   "freecrawler": {
     "isUsedInServer": true,
@@ -5132,8 +5132,8 @@
     "price": 0
   },
   "gauntlet6": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.3668,
     "braking": 0.935,
     "handling": 0.7467,
@@ -5145,7 +5145,7 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 45100
   },
   "gb200": {
     "isUsedInServer": true,
@@ -5670,7 +5670,7 @@
     "handling": 0.43,
     "speed": 4.6667,
     "traction": 1.35,
-    "name": "NULL",
+    "name": "Chaise roulante",
     "make": "NULL",
     "class": "D",
     "seats": 1,
@@ -5775,8 +5775,8 @@
     "price": 0
   },
   "impaler5": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.2537,
     "braking": 0.865,
     "handling": 0.6338,
@@ -5788,11 +5788,11 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 20100
   },
   "impaler6": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.3,
     "braking": 0.7,
     "handling": 0.68,
@@ -5804,7 +5804,7 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 24200
   },
   "imperator": {
     "isUsedInServer": true,
@@ -7617,7 +7617,7 @@
     "handling": 5.488,
     "speed": 56.6681,
     "traction": 1.3,
-    "name": "NULL",
+    "name": "Frogger",
     "make": "",
     "class": "B",
     "seats": 4,
@@ -7634,7 +7634,7 @@
     "handling": 0.55,
     "speed": 38.4494,
     "traction": 1.95,
-    "name": "NULL",
+    "name": "Rumpo",
     "make": "",
     "class": "D",
     "seats": 4,
@@ -8770,8 +8770,8 @@
     "price": 0
   },
   "powersurge": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.82,
     "braking": 1.3,
     "handling": 1.2,
@@ -8783,7 +8783,7 @@
     "seats": 1,
     "doors": 1,
     "type": "bike",
-    "price": 0
+    "price": 113600
   },
   "prairie": {
     "isUsedInServer": true,
@@ -11637,7 +11637,7 @@
     "handling": 0.645,
     "speed": 44.644,
     "traction": 2.25,
-    "name": "NULL",
+    "name": "Cheburek",
     "make": "RUNE",
     "class": "A",
     "seats": 4,
@@ -12476,7 +12476,7 @@
     "handling": 0.719,
     "speed": 46.9796,
     "traction": 2.285,
-    "name": "NULL",
+    "name": "Rhinehart",
     "make": "Ubermacht",
     "class": "A",
     "seats": 4,
@@ -12694,8 +12694,8 @@
     "price": 75200
   },
   "turismo3": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.374,
     "braking": 1.185,
     "handling": 0.754,
@@ -12707,7 +12707,7 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 135400
   },
   "turismor": {
     "isUsedInServer": true,
@@ -13128,8 +13128,8 @@
     "price": 75785
   },
   "vigero3": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.3645,
     "braking": 0.95,
     "handling": 0.8245,
@@ -13141,7 +13141,7 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 50000
   },
   "vigilante": {
     "isUsedInServer": false,
@@ -13272,8 +13272,8 @@
     "price": 176300
   },
   "vivanite": {
-    "isUsedInServer": false,
-    "isPlayerAllowed": false,
+    "isUsedInServer": true,
+    "isPlayerAllowed": true,
     "acceleration": 0.1095,
     "braking": 0.78,
     "handling": 0.5895,
@@ -13285,7 +13285,7 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 28300
   },
   "volatol": {
     "isUsedInServer": false,
