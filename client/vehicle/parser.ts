@@ -53,8 +53,8 @@ onServerCallback('ox:generateVehicleData', async (parseAll: boolean, playerVehic
     };
 
     const data: VehicleData = {
-      isUsedInServer: vehiclePrices[model] ? true : false,
-      isPlayerAllowed: playerVehicles[model] ? true : false,
+      isUsedInServer: vehiclePrices[model] !== undefined ? true : false,
+      isPlayerAllowed: playerVehicles[model] !== undefined ? true : false,
       acceleration: stats.acceleration,
       braking: stats.braking,
       handling: stats.handling,

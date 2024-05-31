@@ -1,6 +1,6 @@
 {
   "2vd_aleutian": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.2795,
     "braking": 0.75,
@@ -16,7 +16,7 @@
     "price": 0
   },
   "2vd_bstx": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.3425,
     "braking": 0.95,
@@ -32,7 +32,7 @@
     "price": 0
   },
   "2vd_cypher": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.326,
     "braking": 0.7,
@@ -48,7 +48,7 @@
     "price": 0
   },
   "2vd_dvigerozx": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.3645,
     "braking": 0.95,
@@ -64,7 +64,7 @@
     "price": 0
   },
   "2vd_gauntlet4": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.36,
     "braking": 0.9,
@@ -80,7 +80,7 @@
     "price": 0
   },
   "2vd_impaler5": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.2537,
     "braking": 0.865,
@@ -96,7 +96,7 @@
     "price": 0
   },
   "2vd_speedo5": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.32,
     "braking": 1,
@@ -112,7 +112,7 @@
     "price": 0
   },
   "2vd_vcaracara": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.27,
     "braking": 0.3,
@@ -3124,7 +3124,7 @@
     "price": 19200
   },
   "dccasterope": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.2,
     "braking": 0.9,
@@ -3140,7 +3140,7 @@
     "price": 0
   },
   "dcccabby": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.15,
     "braking": 0.4,
@@ -3156,7 +3156,7 @@
     "price": 0
   },
   "dccdilettante": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.1,
     "braking": 0.6,
@@ -7739,7 +7739,7 @@
     "price": 95620
   },
   "nkambulance": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.32,
     "braking": 1,
@@ -7755,7 +7755,7 @@
     "price": 0
   },
   "nkbf400": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.29,
     "braking": 1.1,
@@ -7771,7 +7771,7 @@
     "price": 0
   },
   "nkdinghy4": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 16,
     "braking": 0.4,
@@ -7788,7 +7788,7 @@
     "weapons": true
   },
   "nkgresleyems": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.2,
     "braking": 0.6,
@@ -7820,7 +7820,7 @@
     "price": 0
   },
   "nkshinobi": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.3625,
     "braking": 1.25,
@@ -7836,7 +7836,7 @@
     "price": 0
   },
   "nkstxems": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.3425,
     "braking": 0.95,
@@ -7852,7 +7852,7 @@
     "price": 0
   },
   "nksvolitoems": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.32,
     "braking": 1,
@@ -11630,7 +11630,7 @@
     "price": 4650
   },
   "tcheburek": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.265,
     "braking": 0.8,
@@ -12469,7 +12469,7 @@
     "price": 0
   },
   "trhinehart": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.339,
     "braking": 0.885,
