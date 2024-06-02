@@ -15,6 +15,11 @@ const anims = [
   ['veh@low@front_ps@idle_duck', 'sit'],
 ];
 
+const allowedAnimationsWhileDead = [
+    ['nm', 'firemans_carry'],
+    ['amb@code_human_in_car_idles@generic@ps@base', 'base'],
+];
+
 let playerIsDead = false;
 
 /**
@@ -63,6 +68,14 @@ async function ClearDeath(tickId: number, bleedOut: boolean) {
   for (let index = 0; index < anims.length; index++) RemoveAnimDict(anims[index][0]);
 }
 
+function IsPlayingAllowedAnim() {
+    for (let index = 0; index < allowedAnimationsWhileDead.length; index++) {
+        const anim = allowedAnimationsWhileDead[index];
+        if (IsEntityPlayingAnim(cache.ped, anim[0], anim[1], 3)) return true;
+    }
+    return false;
+}
+
 async function OnPlayerDeath() {
   OxPlayer.state.set("isDead", true, true);
   const newTimestamp = Date.now() + 10 * 60 * 1000; // 10 minutes
@@ -80,7 +93,7 @@ async function OnPlayerDeath() {
     const anim = cache.vehicle ? anims[1] : anims[0];
     const currentDate = Date.now();
 
-    if (!IsEntityPlayingAnim(cache.ped, anim[0], anim[1], 3)){
+    if (!IsEntityPlayingAnim(cache.ped, anim[0], anim[1], 3) && !IsPlayingAllowedAnim()){
         await requestAnimDict(anim[0]);
         TaskPlayAnim(cache.ped, anim[0], anim[1], 50.0, 8.0, -1, 1, 1.0, false, false, false);
         RemoveAnimDict(anim[0])
