@@ -1,13 +1,13 @@
 import { db } from 'db';
-import type { DbGroups } from 'types';
+import type { DbGroup } from 'types';
 
 export function SelectGroups() {
-  return db.query<DbGroups>(`
+  return db.query<DbGroup>(`
     SELECT 
       ox_groups.*, 
       JSON_ARRAYAGG(ox_group_grades.label ORDER BY ox_group_grades.grade) AS grades
     FROM 
-        ox_groups 
+        ox_groups
     JOIN 
         ox_group_grades
     ON
@@ -36,7 +36,20 @@ export async function RemoveCharacterGroup(charId: number, name: string) {
 }
 
 export function GetCharacterGroups(charId: number) {
-  return db.execute<{ name: string; grade: number }>('SELECT name, grade FROM character_groups WHERE charId = ?', [
-    charId,
-  ]);
+  return db.execute<{ name: string; grade: number; isActive: boolean }>(
+    'SELECT name, grade, isActive FROM character_groups WHERE charId = ?',
+    [charId]
+  );
+}
+
+export async function SetActiveGroup(charId: number, groupName?: string) {
+  using conn = await db.getConnection();
+  const params: [number, string?] = [charId];
+
+  conn.execute(`UPDATE character_groups SET isActive = 0 WHERE charId = ? AND isActive = 1`, params);
+
+  if (groupName) {
+    params.push(groupName);
+    conn.execute(`UPDATE character_groups SET isActive = 1 WHERE charId = ? AND name = ?`, params);
+  }
 }

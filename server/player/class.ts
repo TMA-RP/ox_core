@@ -13,11 +13,17 @@ import {
   UpdateCharacterLicense,
 } from './db';
 import { getRandomChar, getRandomInt } from '@overextended/ox_lib';
-import { GetGroup } from 'groups';
+import { GetGroup, GetGroupsByType } from 'groups';
 import { GeneratePhoneNumber } from 'bridge/npwd';
 import { Statuses } from './status';
 import { addPrincipal, removePrincipal } from '@overextended/ox_lib/server';
-import { AddCharacterGroup, GetCharacterGroups, RemoveCharacterGroup, UpdateCharacterGroup } from 'groups/db';
+import {
+  AddCharacterGroup,
+  GetCharacterGroups,
+  RemoveCharacterGroup,
+  UpdateCharacterGroup,
+  SetActiveGroup,
+} from 'groups/db';
 import { GetCharacterAccount, GetCharacterAccounts } from 'accounts';
 import type { Character, Dict, NewCharacter, PlayerMetadata, OxGroup, CharacterLicense } from 'types';
 import { GetGroupPermissions } from '../../common';
@@ -176,6 +182,17 @@ export class OxPlayer extends ClassInterface {
     return GetCharacterAccounts(this.charId, getShared);
   }
 
+  setActiveGroup(groupName: string, temp?: boolean) {
+    if (!(groupName in this.#groups)) return false;
+
+    SetActiveGroup(this.charId, temp ? undefined : groupName);
+
+    this.set('activeGroup', groupName, true);
+    emit('ox:setActiveGroup', this.source, groupName);
+
+    return true;
+  }
+
   /** Sets the active character's grade in a group. If the grade is 0 they will be removed from the group. */
   async setGroup(groupName: string, grade = 0) {
     const group = GetGroup(groupName);
@@ -188,13 +205,13 @@ export class OxPlayer extends ClassInterface {
 
     if (!grade) {
       if (!currentGrade) return;
-
       if (!(await RemoveCharacterGroup(this.charId, group.name))) return;
+      if (this.get('activeGroup') === groupName) this.set('activeGroup', undefined, true);
 
       this.#removeGroup(group, currentGrade);
     } else {
       if (!group.grades[grade] && grade > 0)
-        console.warn(`Failed to set OxPlayer<${this.userId}> ${group.name}:${grade} (invalid grade)`);
+        return console.warn(`Failed to set OxPlayer<${this.userId}> ${group.name}:${grade} (invalid grade)`);
 
       if (currentGrade) {
         if (!(await UpdateCharacterGroup(this.charId, group.name, grade))) return;
@@ -202,6 +219,18 @@ export class OxPlayer extends ClassInterface {
         this.#removeGroup(group, currentGrade);
         this.#addGroup(group, grade);
       } else {
+        const relatedGroups = group.type && GetGroupsByType(group.type);
+
+        if (
+          relatedGroups &&
+          relatedGroups.some((name) => {
+            return name in this.#groups;
+          })
+        )
+          return console.warn(
+            `Failed to set OxPlayer<${this.userId}> ${group.name}:${grade} (already has group of type '${group.type}')`
+          );
+
         if (!(await AddCharacterGroup(this.charId, group.name, grade))) return;
 
         this.#addGroup(group, grade);
@@ -215,29 +244,32 @@ export class OxPlayer extends ClassInterface {
   }
 
   /** Returns the current grade of a given group name, or the first matched name and grade in the filter. */
+  getGroup(filter: string): number;
+  getGroup(filter: string[] | Record<string, number>): [string, number] | [];
   getGroup(filter: string | string[] | Record<string, number>) {
     if (typeof filter === 'string') {
-      const grade = this.#groups[filter];
+      return this.#groups[filter];
+    }
 
-      if (grade) return grade;
+    if (Array.isArray(filter)) {
+      for (const name of filter) {
+        const grade = this.#groups[name];
+        if (grade) return [name, grade];
+      }
     } else if (typeof filter === 'object') {
-      if (Array.isArray(filter)) {
-        for (let i = 0; filter.length; i++) {
-          const name = filter[i];
-          const playerGrade = this.#groups[name];
-
-          if (playerGrade) return [name, playerGrade];
-        }
-      } else {
-        for (const [name, grade] of Object.entries(filter)) {
-          const playerGrade = this.#groups[name];
-
-          if (playerGrade && (grade as number) <= playerGrade) {
-            return [name, playerGrade];
-          }
+      for (const [name, requiredGrade] of Object.entries(filter)) {
+        const grade = this.#groups[name];
+        if (grade && (requiredGrade as number) <= grade) {
+          return [name, grade];
         }
       }
     }
+
+    return [];
+  }
+
+  getGroupByType(type: string) {
+    return this.getGroup(GetGroupsByType(type));
   }
 
   getGroups() {
@@ -382,7 +414,7 @@ export class OxPlayer extends ClassInterface {
     if (typeof group === 'string') group = GetGroup(group);
 
     addPrincipal(this.source as string, `${group.principal}:${grade}`);
-    DEV: console.info(`Added OxPlayer<${this.userId}> to group ${group.name} as grade ${grade}.`);
+    DEV: console.info(`Added OxPlayer<${this.userId}> to group '${group.name}' as grade ${grade}.`);
 
     this.#groups[group.name] = grade;
     GlobalState[`${group.name}:count`] += 1;
@@ -393,7 +425,7 @@ export class OxPlayer extends ClassInterface {
     if (typeof group === 'string') group = GetGroup(group);
 
     removePrincipal(this.source as string, `${group.principal}:${grade}`);
-    DEV: console.info(`Removed OxPlayer<${this.userId}> from group ${group.name}.`);
+    DEV: console.info(`Removed OxPlayer<${this.userId}> from group '${group.name}'.`);
 
     delete this.#groups[group.name];
     GlobalState[`${group.name}:count`] -= 1;
@@ -541,6 +573,7 @@ export class OxPlayer extends ClassInterface {
     this.set('gender', gender, true);
     this.set('dateOfBirth', dateOfBirth, true);
     this.set('phoneNumber', phoneNumber, true);
+    this.set('activeGroup', groups.find((group) => group.isActive)?.name, true);
 
     /**
      * @todo Player metadata can ideally be handled with statebags, but requires security features.
