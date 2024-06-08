@@ -14,6 +14,8 @@ function GetPedsInVehicle(vehicle: number) {
     return peds
 }
 
+export type VehicleInstance = InstanceType<typeof OxVehicle>
+
 export class OxVehicle extends ClassInterface {
   entity: number;
   netId: number;
@@ -28,8 +30,8 @@ export class OxVehicle extends ClassInterface {
   #metadata: Dict<any>;
   #stored: string | null;
 
-  protected static members: Dict<OxVehicle> = {};
-  protected static keys: Dict<Dict<OxVehicle>> = {
+  protected static members: Dict<VehicleInstance> = {};
+  protected static keys: Dict<Dict<VehicleInstance>> = {
     id: {},
     netId: {},
     vin: {},
@@ -56,7 +58,7 @@ export class OxVehicle extends ClassInterface {
   }
 
   /** Gets all instances of OxVehicle. */
-  static getAll(): Dict<OxVehicle> {
+  static getAll(): Dict<VehicleInstance> {
     return this.members;
   }
 

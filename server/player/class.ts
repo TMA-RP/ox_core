@@ -28,6 +28,8 @@ import { GetCharacterAccount, GetCharacterAccounts } from 'accounts';
 import type { Character, Dict, NewCharacter, PlayerMetadata, OxGroup, CharacterLicense } from 'types';
 import { GetGroupPermissions } from '../../common';
 
+export type PlayerInstance = InstanceType<typeof OxPlayer>;
+
 export class OxPlayer extends ClassInterface {
   source: number | string;
   userId: number;
@@ -43,8 +45,8 @@ export class OxPlayer extends ClassInterface {
   #groups: Dict<number>;
   #licenses: Dict<CharacterLicense>;
 
-  protected static members: Dict<OxPlayer> = {};
-  protected static keys: Dict<Dict<OxPlayer>> = {
+  protected static members: Dict<PlayerInstance> = {};
+  protected static keys: Dict<Dict<PlayerInstance>> = {
     userId: {},
     charId: {},
   };
@@ -60,14 +62,10 @@ export class OxPlayer extends ClassInterface {
   }
 
   /** Compares player fields and metadata to a filter, returning the player if all values match. */
-  private filter(filter: Dict<any>) {
-    const groups = filter.groups;
+  private filter(criteria: Dict<any>) {
+    const { groups, ...filter } = criteria;
 
-    if (groups) {
-      if (!this.getGroup(groups)) return;
-
-      delete filter.groups;
-    }
+    if (groups && !this.getGroup(groups)) return;
 
     for (const key in filter) {
       const value = filter[key];
@@ -87,17 +85,19 @@ export class OxPlayer extends ClassInterface {
   }
 
   /** Gets all instances of OxPlayer, optionally comparing against a filter. */
-  static getAll(filter?: Dict<any>): Dict<OxPlayer> {
+  static getAll(filter?: Dict<any>, asArray?: false): Dict<PlayerInstance>;
+  static getAll(filter?: Dict<any>, asArray?: true): PlayerInstance[];
+  static getAll(filter?: Dict<any>, asArray = false): Dict<PlayerInstance> | PlayerInstance[] {
     if (!filter) return this.members;
 
-    const obj: Dict<OxPlayer> = {};
+    const obj: Dict<PlayerInstance> = {};
 
     for (const id in this.members) {
       const player = this.members[id].filter(filter);
       if (player) obj[id] = player;
     }
 
-    return obj;
+    return asArray ? Object.values(obj) : obj;
   }
 
   /** Saves all players to the database, and optionally kicks them from the server. */
@@ -459,14 +459,19 @@ export class OxPlayer extends ClassInterface {
     return maxChars;
   }
 
-  /** Clears data for the active character. If the player is still connected then transition them to character selection. */
-  async logout(dropped?: boolean) {
+  /**
+   * Clears data for the active character. If the player is still connected then transition them to character selection.
+   * @param dropped If the player has been dropped from the server.
+   * @param save If character data should be saved to the database (defaults to true).
+   */
+  async logout(save: boolean = true, dropped = false) {
     if (!this.charId) return;
 
     for (const name in this.#groups) this.#removeGroup(name, this.#groups[name]);
 
     emit('ox:playerLogout', this.source, this.userId, this.charId);
-    await this.save();
+
+    if (save) await this.save();
 
     if (dropped) return;
 
@@ -605,14 +610,18 @@ export class OxPlayer extends ClassInterface {
 
   /** Deletes a character with the given charId if it's owned by the player. */
   async deleteCharacter(charId: number) {
-    if (this.charId) return;
+    const isActive = this.charId === charId;
 
-    const characterSlot = this.#getCharacterSlotFromId(charId);
+    if (this.charId && !isActive) return;
+
+    const characterSlot = isActive ? 0 : this.#getCharacterSlotFromId(charId);
 
     if (characterSlot === -1) return;
 
     if (await DeleteCharacter(charId)) {
-      this.#characters.splice(characterSlot, 1);
+      if (isActive) this.logout(false);
+      else this.#characters.splice(characterSlot, 1);
+
       emit('ox:deletedCharacter', this.source, this.userId, charId);
 
       DEV: console.info(`Deleted character ${this.charId} for OxPlayer<${this.userId}>`);
@@ -626,4 +635,4 @@ OxPlayer.init();
 exports('SaveAllPlayers', (arg: any) => OxPlayer.saveAll(arg));
 exports('GetPlayerFromUserId', (arg: any) => OxPlayer.getFromUserId(arg));
 exports('GetPlayerFromFilter', (arg: any) => OxPlayer.getFromFilter(arg));
-exports(`GetPlayers`, (arg: any) => OxPlayer.getAll(arg));
+exports(`GetPlayers`, (arg: any) => OxPlayer.getAll(arg, true));
