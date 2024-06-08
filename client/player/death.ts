@@ -145,7 +145,7 @@ async function OnPlayerDeath() {
   });
 
   const coords = GetEntityCoords(cache.ped, true);
-  const health = GetEntityMaxHealth(cache.ped) - 50;
+  const health = GetEntityMaxHealth(cache.ped) - 65;
 
   while (IsPedRagdoll(cache.ped)) await sleep(0);
 
