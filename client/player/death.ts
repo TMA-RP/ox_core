@@ -30,8 +30,12 @@ let playerIsDead = false;
 
 async function ClearDeath(tickId: number, bleedOut: boolean) {
   OxPlayer.state.set("isDead", false, true);
+  exports['pma-voice'].resetProximityCheck();
+  exports["lb-phone"].ToggleDisabled(false);
+  exports["scully_emotemenu"].setLimitation(false);
   const anim = cache.vehicle ? anims[1] : anims[0];
   OxPlayer.state.set("deathTimestamp", false, true)
+  OxPlayer.state.set("invBusy", false, false);
   playerIsDead = false;
   clearTick(tickId);
 
@@ -85,6 +89,14 @@ async function OnPlayerDeath() {
   
   playerIsDead = true;
 
+  exports['pma-voice'].overrideProximityCheck(() => {
+    return false
+  });
+  exports["lb-phone"].ToggleOpen(false, true);
+  exports["lb-phone"].ToggleDisabled(true);
+  exports["scully_emotemenu"].setLimitation(true);
+  OxPlayer.state.set("invBusy", true, false);
+  
   emit('ox_inventory:disarm');
   AnimpostfxPlay('DeathFailOut', 0, true);
   let hasSentDistress = false;
