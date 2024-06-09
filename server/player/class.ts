@@ -590,14 +590,14 @@ export class OxPlayer extends ClassInterface {
     const state = Player(this.source).state;
     state.set('isDead', isDead === 1, true);
 
+    const sendToClient = ['blood', 'inDuty', 'inProperty', 'inGarage']
+    const setAsStatebag = ['inDuty']
      // Values stored in metadata and synced to client.
      if(character.data) {
         const cData = JSON.parse(character.data)
         for (const key in cData) {
-            if (!['mugshot'].includes(key)) {
-                this.set(key, cData[key], true);
-                state.set(key, cData[key], true);
-            }
+            this.set(key, cData[key], sendToClient.includes(key));
+            if(setAsStatebag.includes(key)) state.set(key, cData[key], true);
         }
     }
 
