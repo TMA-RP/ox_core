@@ -40,7 +40,7 @@ async function ClearDeath(tickId: number, bleedOut: boolean) {
   clearTick(tickId);
 
   if (bleedOut) {
-    const hospital = Vector4.fromArray([315.1152, -568.4263, 48.2142, 257.3210]);
+    const hospital = Vector4.fromArray([323.5289, -584.9305, 43.2841, 64.2267]);
 
     DoScreenFadeOut(800);
     RequestCollisionAtCoord(hospital.x, hospital.y, hospital.z);
@@ -82,7 +82,7 @@ function IsPlayingAllowedAnim() {
 
 async function OnPlayerDeath() {
   OxPlayer.state.set("isDead", true, true);
-  const newTimestamp = Date.now() + 10 * 60 * 1000; // 10 minutes
+  const newTimestamp = Date.now() + 5 * 60 * 1000; // 5 minutes
   const oldTimestamp = OxPlayer.state.deathTimestamp;
   const timestamp = oldTimestamp ? oldTimestamp : newTimestamp;
   if (!oldTimestamp) OxPlayer.state.set("deathTimestamp", newTimestamp, true); 
