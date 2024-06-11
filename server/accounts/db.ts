@@ -132,10 +132,13 @@ export async function CreateNewAccount(
 ) {
   const accountId = await GenerateAccountId();
   const result =
-    (await db.execute<boolean>(
-      `INSERT INTO accounts (id, label, \`${column}\`, type, isDefault) VALUES (?, ?, ?, ?, ?)`,
-      [accountId, label, id, shared ? 'shared' : 'personal', isDefault || 0]
-    )).affectedRows === 1;
+    (await db.update(`INSERT INTO accounts (id, label, \`${column}\`, type, isDefault) VALUES (?, ?, ?, ?, ?)`, [
+      accountId,
+      label,
+      id,
+      shared ? 'shared' : 'personal',
+      isDefault || 0,
+    ])) === 1;
 
   if (result)
     db.insert(`INSERT INTO accounts_access (accountId, charId, role) VALUE (?, ?, ?)`, [accountId, id, 'owner']);
@@ -157,7 +160,7 @@ export async function DepositMoney(
   playerId: number,
   accountId: number,
   amount: number,
-  mesasge?: string,
+  message?: string,
   note?: string
 ) {
   const { charId } = OxPlayer.get(playerId);
@@ -191,7 +194,7 @@ export async function DepositMoney(
     null,
     accountId,
     amount,
-    mesasge ?? locales('deposit'),
+    message ?? locales('deposit'),
     note,
     null,
     balance + amount,
@@ -237,7 +240,7 @@ export async function WithdrawMoney(
     message ?? locales('withdraw'),
     note,
     balance - amount,
-    null
+    null,
   ]);
   conn.commit();
   return true;
