@@ -75,8 +75,8 @@ export async function PerformTransaction(
 
   try {
     const a =
-      (await conn.execute(overdraw ? removeBalance : safeRemoveBalance, [amount, fromId, amount])).affectedRows === 1;
-    const b = (await conn.execute(addBalance, [amount, toId])).affectedRows === 1;
+      (await conn.execute(overdraw ? removeBalance : safeRemoveBalance, [amount, fromId, amount]))?.affectedRows === 1;
+    const b = (await conn.execute(addBalance, [amount, toId]))?.affectedRows === 1;
 
     if (a && b) {
       await conn.execute(addTransaction, [
@@ -89,7 +89,7 @@ export async function PerformTransaction(
         fromBalance - amount,
         toBalance + amount,
       ]);
-      await conn.commit();
+
       return true;
     }
   } catch (e) {
@@ -136,16 +136,18 @@ export async function CreateNewAccount(
 
   const accountId = await GenerateAccountId(conn);
   const result =
-    (await db.update(`INSERT INTO accounts (id, label, \`${column}\`, type, isDefault) VALUES (?, ?, ?, ?, ?)`, [
-      accountId,
-      label,
-      id,
-      shared ? 'shared' : 'personal',
-      isDefault || 0,
-    ])) === 1;
+    (
+      await conn.execute(`INSERT INTO accounts (id, label, \`${column}\`, type, isDefault) VALUES (?, ?, ?, ?, ?)`, [
+        accountId,
+        label,
+        id,
+        shared ? 'shared' : 'personal',
+        isDefault || 0,
+      ])
+    )?.affectedRows === 1;
 
-  if (result)
-    db.insert(`INSERT INTO accounts_access (accountId, charId, role) VALUE (?, ?, ?)`, [accountId, id, 'owner']);
+  if (result && typeof id === 'number')
+    conn.execute(`INSERT INTO accounts_access (accountId, charId, role) VALUE (?, ?, ?)`, [accountId, id, 'owner']);
 
   return accountId;
 }
@@ -176,8 +178,8 @@ export async function DepositMoney(
   if (amount > money) return 'insufficient_funds';
 
   using conn = await db.getConnection();
-
   const balance = db.scalar<number>(await conn.execute(getBalance, [accountId]));
+
   if (balance === null) return 'no_balance';
 
   const role = db.scalar<string>(await conn.execute(selectAccountRole, [accountId, charId]));
@@ -186,7 +188,7 @@ export async function DepositMoney(
 
   await conn.beginTransaction();
 
-  const { affectedRows } = await conn.execute(addBalance, [amount, accountId]);
+  const affectedRows = (await conn.execute(addBalance, [amount, accountId]))?.affectedRows;
 
   if (!affectedRows || !exports.ox_inventory.RemoveItem(playerId, 'money', amount)) {
     conn.rollback();
@@ -203,7 +205,7 @@ export async function DepositMoney(
     null,
     balance + amount,
   ]);
-  conn.commit();
+
   return true;
 }
 
@@ -229,7 +231,7 @@ export async function WithdrawMoney(
 
   await conn.beginTransaction();
 
-  const { affectedRows } = await conn.execute(safeRemoveBalance, [amount, accountId, amount]);
+  const affectedRows = (await conn.execute(safeRemoveBalance, [amount, accountId, amount]))?.affectedRows;
 
   if (!affectedRows || !exports.ox_inventory.AddItem(playerId, 'money', amount)) {
     conn.rollback();
@@ -246,7 +248,7 @@ export async function WithdrawMoney(
     balance - amount,
     null,
   ]);
-  conn.commit();
+
   return true;
 }
 

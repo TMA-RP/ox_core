@@ -124,19 +124,47 @@ const connectionConfig: PoolConfig = (() => {
   };
 })();
 
-export interface DbConnection extends PoolConnection {
-  execute<T = MySqlRow[] & OkPacket>(query: string | QueryOptions, values?: any[]): Promise<T>;
-  query<T = MySqlRow[] & OkPacket>(query: string | QueryOptions, values?: any[]): Promise<T>;
-  [Symbol.dispose](): void;
+class Connection {
+  public transaction?: boolean;
+
+  constructor(public connection: PoolConnection) {}
+
+  async execute<T = MySqlRow[] & OkPacket>(query: string | QueryOptions, values?: any[]) {
+    return (await this.connection.execute(query, values)) as T;
+  }
+
+  async query<T = MySqlRow[] & OkPacket>(query: string | QueryOptions, values?: any[]) {
+    return (await this.connection.query(query, values)) as T;
+  }
+
+  beginTransaction() {
+    this.transaction = true;
+    return this.connection.beginTransaction();
+  }
+
+  rollback() {
+    delete this.transaction;
+    return this.connection.rollback();
+  }
+
+  commit() {
+    return this.connection.commit();
+  }
+
+  [Symbol.dispose]() {
+    if (this.transaction) this.commit();
+    this.connection.release();
+  }
 }
+
+export type DbConnection = InstanceType<typeof Connection>;
 
 export async function getConnection() {
   while (!isServerConnected) {
     await sleep(0);
   }
 
-  const connection = (await pool.getConnection()) as DbConnection;
-  connection[Symbol.dispose] = connection.release;
+  const connection = new Connection(await pool.getConnection());
 
   return connection;
 }
