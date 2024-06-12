@@ -33,8 +33,8 @@ export type PlayerInstance = InstanceType<typeof OxPlayer>;
 export class OxPlayer extends ClassInterface {
   source: number | string;
   userId: number;
-  charId: number;
-  stateId: string;
+  charId?: number;
+  stateId?: string;
   username: string;
   identifier: string;
   ped: number;
@@ -112,7 +112,6 @@ export class OxPlayer extends ClassInterface {
       }
 
       if (kickWithReason) {
-        //@ts-ignore
         delete player.charId;
         DropPlayer(player.source as string, kickWithReason);
       }
@@ -174,16 +173,18 @@ export class OxPlayer extends ClassInterface {
 
   /** Returns the default account for the active character. */
   getAccount() {
+    if (!this.charId) return;
     return GetCharacterAccount(this.charId);
   }
 
   /** Returns all accounts for the active character. Passing `true` will include accounts the character has access to. */
   getAccounts(getShared?: boolean) {
+    if (!this.charId) return;
     return GetCharacterAccounts(this.charId, getShared);
   }
 
   setActiveGroup(groupName: string, temp?: boolean) {
-    if (!(groupName in this.#groups)) return false;
+    if (!this.charId || !(groupName in this.#groups)) return false;
 
     SetActiveGroup(this.charId, temp ? undefined : groupName);
 
@@ -195,6 +196,8 @@ export class OxPlayer extends ClassInterface {
 
   /** Sets the active character's grade in a group. If the grade is 0 they will be removed from the group. */
   async setGroup(groupName: string, grade = 0) {
+    if (!this.charId) return false;
+
     const group = GetGroup(groupName);
 
     if (!group) return console.warn(`Failed to set OxPlayer<${this.userId}> ${groupName}:${grade} (invalid group)`);
@@ -347,9 +350,9 @@ export class OxPlayer extends ClassInterface {
   }
 
   async addLicense(licenseName: string) {
-    const issued = Date.now();
+    if (!this.charId || this.#licenses[licenseName]) return false;
 
-    if (this.#licenses[licenseName]) return false;
+    const issued = Date.now();
 
     const license = {
       issued,
@@ -366,7 +369,7 @@ export class OxPlayer extends ClassInterface {
   }
 
   async removeLicense(licenseName: string) {
-    if (!(await RemoveCharacterLicense(this.charId, licenseName))) return false;
+    if (!this.charId || !(await RemoveCharacterLicense(this.charId, licenseName))) return false;
 
     delete this.#licenses[licenseName];
 
@@ -377,6 +380,8 @@ export class OxPlayer extends ClassInterface {
   }
 
   async updateLicense(licenseName: string, key: string, value: any) {
+    if (!this.charId) return false;
+
     const license = this.#licenses[licenseName];
 
     if (!license || key === 'issued') return false;
@@ -473,7 +478,6 @@ export class OxPlayer extends ClassInterface {
 
     if (dropped) return;
 
-    //@ts-ignore
     delete this.charId;
 
     this.emit('ox:startCharacterSelect', this.userId, await this.#getCharacters(), await this.#getMaxCharacters());
