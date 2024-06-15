@@ -4552,6 +4552,22 @@
     "type": "bike",
     "price": 16300
   },
+  "fdtruck": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
+    "acceleration": 0.45,
+    "braking": 0.8,
+    "handling": 0.83,
+    "speed": 43.3333,
+    "traction": 1.75,
+    "name": "NULL",
+    "make": "Voodoo",
+    "class": "A",
+    "seats": 2,
+    "doors": 5,
+    "type": "automobile",
+    "price": 0
+  },
   "felon": {
     "isUsedInServer": true,
     "isPlayerAllowed": true,
