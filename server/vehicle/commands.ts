@@ -31,7 +31,6 @@ addCommand<{ model: string; owner?: number }>(
     if(!args.owner) {
         data.data = {
             isOpen: true,
-            adminCar: true
         }
     }
     
