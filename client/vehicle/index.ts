@@ -32,7 +32,7 @@ AddStateBagChangeHandler('initVehicle', '', async (bagName: string, key: string,
 
   await waitFor(async () => {
     if (!IsEntityWaitingForWorldCollision(entity)) return true;
-  });
+  }, 'failed to wait for world collision');
 
   if (NetworkGetEntityOwner(entity) !== cache.playerId) return;
 
