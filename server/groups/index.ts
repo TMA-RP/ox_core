@@ -113,7 +113,12 @@ addCommand<{ target: string; group: string; grade?: number }>(
   'setgroup',
   async (playerId, args, raw) => {
     const player = OxPlayer.get(args.target);
-
+    if (args.group !== "admin") {
+        const [currentGroup, _] = player?.getGroupByType("job")
+        if (currentGroup && currentGroup !== args.group) {
+            player?.setGroup(currentGroup, 0);
+        }
+    }
     player?.setGroup(args.group, args.grade || 0);
   },
   {
