@@ -1,4 +1,4 @@
-import { addAce, addCommand, addPrincipal, removeAce, removePrincipal } from '@overextended/ox_lib/server';
+import { addAce, addCommand, addPrincipal, removeAce, removePrincipal, sleep } from '@overextended/ox_lib/server';
 import { SelectGroups } from './db';
 import { OxPlayer } from 'player/class';
 import type { Dict, OxGroup, DbGroup } from 'types';
@@ -114,9 +114,13 @@ addCommand<{ target: string; group: string; grade?: number }>(
   async (playerId, args, raw) => {
     const player = OxPlayer.get(args.target);
     if (args.group !== "admin") {
-        const [currentGroup, _] = player?.getGroupByType("job")
-        if (currentGroup && currentGroup !== args.group) {
-            player?.setGroup(currentGroup, 0);
+        const group = player.getGroupByType("job")
+        if (group) {
+            const [currentGroup, _] = group
+            if (currentGroup && currentGroup !== args.group) {
+                player.setGroup(currentGroup, 0);
+                await sleep(100)
+            }
         }
     }
     player?.setGroup(args.group, args.grade || 0);
