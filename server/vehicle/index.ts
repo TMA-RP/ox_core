@@ -156,7 +156,7 @@ export async function SpawnVehicle(id: number, coords: number | number[], headin
 setInterval(async () => {
     for (const key of Object.keys(OxVehicle.getAll())) {
         const vehicle = OxVehicle.get(key);
-        if (DoesEntityExist(vehicle.entity)) {
+        if (vehicle.entity && DoesEntityExist(vehicle.entity)) {
           const ownerId = NetworkGetEntityOwner(NetworkGetEntityFromNetworkId(vehicle.netId));
           if (ownerId && ownerId !== -1) {
             const properties = await triggerClientCallback('ceeb_vehicle:getProperties', ownerId, vehicle.netId);
@@ -199,6 +199,7 @@ function GetPlayersInVehicle(vehicle: number) {
 }
 
 AddStateBagChangeHandler('', '', async (bagName: string, key: string, value: any) => {
+    if (key === "vehicleProperties") return
     const entity = GetEntityFromStateBagName(bagName)
     if (!entity) return
     const vehicle = OxVehicle.get(entity)
