@@ -70,6 +70,8 @@ async function ClearDeath(tickId: number, bleedOut: boolean) {
   SetPlayerInvincible(cache.playerId, false);
 
   for (let index = 0; index < anims.length; index++) RemoveAnimDict(anims[index][0]);
+
+  emit('ox:playerRevived');
 }
 
 function IsPlayingAllowedAnim() {
@@ -98,6 +100,7 @@ async function OnPlayerDeath() {
   OxPlayer.state.set("invBusy", true, false);
   
   emit('ox_inventory:disarm');
+  emit('ox:playerDeath');
   AnimpostfxPlay('DeathFailOut', 0, true);
   let hasSentDistress = false;
 
@@ -157,6 +160,20 @@ async function OnPlayerDeath() {
   SetEntityHealth(cache.ped, health);
   SetEveryoneIgnorePlayer(cache.playerId, true);
 }
+
+AddStateBagChangeHandler(
+  'isDead',
+  `player:${cache.serverId}`,
+  async (bagName: string, key: string, value: any, reserved: number, replicated: boolean) => {
+    if (!replicated) return;
+
+    playerIsDead = value;
+  }
+);
+
+on('ox:playerLogout', () => {
+  playerIsDead = false;
+});
 
 on('ox:playerLoaded', () => {
   const id: CitizenTimer = setInterval(() => {

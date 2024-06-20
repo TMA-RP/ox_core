@@ -48,7 +48,7 @@ export function GetMaxCharacters(userId: number) {
 
 export function SaveCharacterData(values: any[] | any[][], batch?: boolean) {
   const query =
-    'UPDATE characters SET x = ?, y = ?, z = ?, heading = ?, isDead = ?, lastPlayed = CURRENT_DATE(), health = ?, armour = ?, statuses = ?, data = ? WHERE charId = ?';
+    'UPDATE characters SET x = ?, y = ?, z = ?, heading = ?, isDead = ?, lastPlayed = CURRENT_TIMESTAMP(), health = ?, armour = ?, statuses = ?, data = ? WHERE charId = ?';
 
   return batch ? db.batch(query, values) : db.update(query, values);
 }

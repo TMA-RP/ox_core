@@ -33,7 +33,6 @@ export interface PlayerMetadata {
   dateOfBirth: string;
   phoneNumber: string;
   activeGroup?: string;
-  [key: string]: any;
 }
 
 export interface CharacterLicense {

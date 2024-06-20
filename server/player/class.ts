@@ -40,7 +40,7 @@ export class OxPlayer extends ClassInterface {
   ped: number;
   #characters: Character[];
   #inScope: Dict<true> = {};
-  #metadata: PlayerMetadata;
+  #metadata: Dict<any>;
   #statuses: Dict<number>;
   #groups: Dict<number>;
   #licenses: Dict<CharacterLicense>;
@@ -130,7 +130,7 @@ export class OxPlayer extends ClassInterface {
     this.source = source;
     this.#characters = [];
     this.#inScope = {};
-    this.#metadata = {} as PlayerMetadata;
+    this.#metadata = {};
     this.#statuses = {};
     this.#groups = {};
     this.#licenses = {};
@@ -142,6 +142,11 @@ export class OxPlayer extends ClassInterface {
   }
 
   /** Stores a value in the active character's metadata. */
+  set<K extends string>(
+    key: K | keyof PlayerMetadata,
+    value: K extends keyof PlayerMetadata ? PlayerMetadata[K] : any,
+    replicated?: boolean
+  ): void;
   set(key: string, value: any, replicated?: boolean) {
     this.#metadata[key] = value;
 
@@ -150,7 +155,7 @@ export class OxPlayer extends ClassInterface {
   }
 
   /** Gets a value stored in active character's metadata. */
-  get(key: keyof PlayerMetadata) {
+  get<K extends string>(key: K | keyof PlayerMetadata): K extends keyof PlayerMetadata ? PlayerMetadata[K] : any {
     return this.#metadata[key];
   }
 
@@ -183,8 +188,8 @@ export class OxPlayer extends ClassInterface {
     return GetCharacterAccounts(this.charId, getShared);
   }
 
-  setActiveGroup(groupName: string, temp?: boolean) {
-    if (!this.charId || !(groupName in this.#groups)) return false;
+  setActiveGroup(groupName?: string, temp?: boolean) {
+    if (!this.charId || (groupName && !(groupName in this.#groups))) return false;
 
     SetActiveGroup(this.charId, temp ? undefined : groupName);
 
