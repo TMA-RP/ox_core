@@ -62,7 +62,7 @@ netEvent('ox:startCharacterSelect', async (_userId: number, characters: Characte
 
   RequestCollisionAtCoord(x, y, z);
   FreezeEntityPosition(cache.ped, true);
-  SetEntityCoordsNoOffset(cache.ped, x, y, z, true, true, false);
+  SetEntityCoordsNoOffset(cache.ped, x, y, z + 1.0, true, true, false);
   SetEntityHeading(cache.ped, heading);
 
   if (!CHARACTER_SELECT) return;
