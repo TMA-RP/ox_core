@@ -114,7 +114,7 @@ on('ox:createdCharacter', async (playerId: number, userId: number, charId: numbe
   db.execute('INSERT INTO character_inventory (charId) VALUES (?)', [charId]);
 
   if (CREATE_DEFAULT_ACCOUNT)
-    CreateNewAccount('owner', charId, 'Personel', false, true);
+    CreateNewAccount('owner', charId, 'Personnel', false, true);
 });
 
 onNet('ox:updateStatuses', async (data: Dict<OxStatus>) => {
