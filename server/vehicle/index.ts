@@ -156,13 +156,13 @@ export async function SpawnVehicle(id: number, coords: number | number[], headin
 setInterval(async () => {
     for (const key of Object.keys(OxVehicle.getAll())) {
         const vehicle = OxVehicle.get(key);
-        if (vehicle.entity && DoesEntityExist(vehicle.entity)) {
+        if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity)) {
           const ownerId = NetworkGetEntityOwner(NetworkGetEntityFromNetworkId(vehicle.netId));
           if (ownerId && ownerId !== -1) {
             const properties = await triggerClientCallback('ceeb_vehicle:getProperties', ownerId, vehicle.netId);
             if (properties) vehicle.set('properties', properties);
           }
-		  if (vehicle.entity && DoesEntityExist(vehicle.entity)) {
+		  if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity)) {
 			const coords = GetEntityCoords(vehicle.entity);
 			const heading = GetEntityHeading(vehicle.entity);
 			vehicle.set('coords', [coords[0], coords[1], coords[2], heading]);
