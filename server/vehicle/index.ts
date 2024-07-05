@@ -162,9 +162,11 @@ setInterval(async () => {
             const properties = await triggerClientCallback('ceeb_vehicle:getProperties', ownerId, vehicle.netId);
             if (properties) vehicle.set('properties', properties);
           }
-          const coords = GetEntityCoords(vehicle.entity);
-          const heading = GetEntityHeading(vehicle.entity);
-          vehicle.set('coords', [coords[0], coords[1], coords[2], heading]);
+		  if (vehicle.entity && DoesEntityExist(vehicle.entity)) {
+			const coords = GetEntityCoords(vehicle.entity);
+			const heading = GetEntityHeading(vehicle.entity);
+			vehicle.set('coords', [coords[0], coords[1], coords[2], heading]);
+		  }
         }
     }
 }, 5000);
