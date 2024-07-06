@@ -7,6 +7,6 @@ on('entityRemoved', (entityId: number) => {
 
 	if (!vehicle) return;
 
-	//   vehicle.setStored('impound', true);
 	console.log(`[OX] Vehicle ${vehicle.id} (${vehicle.plate}) has been randomly deleted.`);
+	vehicle.setStored('impound', true);
 });
