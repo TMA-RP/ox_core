@@ -43,6 +43,7 @@ export async function CreateVehicle(
 				return vehicle;
 			}
 
+			console.log("[ox_core] Despawning vehicle with plate in order to respawn it " + vehicle.plate)
 			vehicle.despawn(true);
 		}
 	}

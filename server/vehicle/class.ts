@@ -104,6 +104,8 @@ export class OxVehicle extends ClassInterface {
 					parameters.push(vehicle.#getSaveData());
 				}
 
+				if (despawn) console.log("[ox_core] Despawning vehicle with plate " + vehicle.plate + " because there is a saveAll with despawn option to true")
+				if (despawn) console.log("[ox_core] Resource", resource)
 				if (despawn) vehicle.despawn();
 			}
 		}
@@ -186,7 +188,6 @@ export class OxVehicle extends ClassInterface {
 			}
 		}
 		if (occupants.length > 0) await sleep(1500);
-		console.log("[ox_core/server/vehicle/class] Despawning vehicle with plate: " + this.plate)
 		if (DoesEntityExist(this.entity)) DeleteEntity(this.entity);
 		OxVehicle.remove(this.entity);
 	}
