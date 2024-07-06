@@ -13,7 +13,7 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 44500
   },
   "2vd_bstx": {
     "isUsedInServer": true,
@@ -29,7 +29,7 @@
     "seats": 5,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 41850
   },
   "2vd_cypher": {
     "isUsedInServer": true,
@@ -45,7 +45,7 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 42600
   },
   "2vd_dvigerozx": {
     "isUsedInServer": true,
@@ -61,7 +61,7 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 78950
   },
   "2vd_gauntlet4": {
     "isUsedInServer": true,
@@ -77,7 +77,7 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 0
+    "price": 46800
   },
   "2vd_impaler5": {
     "isUsedInServer": true,
@@ -109,7 +109,7 @@
     "seats": 4,
     "doors": 5,
     "type": "automobile",
-    "price": 0
+    "price": 25622
   },
   "2vd_vcaracara": {
     "isUsedInServer": true,
@@ -125,7 +125,7 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 45900
   },
   "2vd_vstanier": {
     "isUsedInServer": true,
@@ -141,7 +141,7 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 15700
   },
   "adder": {
     "isUsedInServer": true,
@@ -3153,7 +3153,7 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 12200
   },
   "dcccabby": {
     "isUsedInServer": true,
@@ -3169,7 +3169,7 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 26300
   },
   "dccdilettante": {
     "isUsedInServer": true,
@@ -3185,7 +3185,7 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 8300
   },
   "deathbike": {
     "isUsedInServer": false,
@@ -4555,14 +4555,14 @@
   "fdtruck": {
     "isUsedInServer": false,
     "isPlayerAllowed": false,
-    "acceleration": 0.45,
-    "braking": 0.8,
-    "handling": 0.83,
-    "speed": 43.3333,
-    "traction": 1.75,
+    "acceleration": 0.12,
+    "braking": 0.25,
+    "handling": 0.5,
+    "speed": 34.4979,
+    "traction": 1.65,
     "name": "NULL",
     "make": "Voodoo",
-    "class": "A",
+    "class": "D",
     "seats": 2,
     "doors": 5,
     "type": "automobile",
@@ -7672,7 +7672,7 @@
     "seats": 4,
     "doors": 5,
     "type": "automobile",
-    "price": 5200
+    "price": 7600
   },
   "nightblade": {
     "isUsedInServer": true,
@@ -7784,7 +7784,7 @@
     "seats": 4,
     "doors": 5,
     "type": "automobile",
-    "price": 0
+    "price": 23600
   },
   "nkbf400": {
     "isUsedInServer": true,
@@ -7800,10 +7800,10 @@
     "seats": 2,
     "doors": 1,
     "type": "bike",
-    "price": 0
+    "price": 35400
   },
   "nkdinghy4": {
-    "isUsedInServer": true,
+    "isUsedInServer": false,
     "isPlayerAllowed": false,
     "acceleration": 16,
     "braking": 0.4,
@@ -7833,10 +7833,10 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 35100
   },
   "nkmule5": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.11,
     "braking": 0.25,
@@ -7849,7 +7849,7 @@
     "seats": 2,
     "doors": 2,
     "type": "automobile",
-    "price": 0
+    "price": 34500
   },
   "nkshinobi": {
     "isUsedInServer": true,
@@ -7865,7 +7865,7 @@
     "seats": 1,
     "doors": 1,
     "type": "bike",
-    "price": 0
+    "price": 36500
   },
   "nkstxems": {
     "isUsedInServer": true,
@@ -7881,10 +7881,10 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 41250
   },
   "nksvolitoems": {
-    "isUsedInServer": true,
+    "isUsedInServer": false,
     "isPlayerAllowed": false,
     "acceleration": 5.635,
     "braking": 3.4919,
@@ -9363,7 +9363,7 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 12100
+    "price": 17200
   },
   "rentalbus": {
     "isUsedInServer": false,
@@ -10776,7 +10776,7 @@
     "seats": 4,
     "doors": 5,
     "type": "automobile",
-    "price": 4500
+    "price": 20140
   },
   "speedo2": {
     "isUsedInServer": false,
@@ -11566,8 +11566,8 @@
     "price": 17950
   },
   "tampa2": {
-    "isUsedInServer": true,
-    "isPlayerAllowed": true,
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.33,
     "braking": 0.5,
     "handling": 0.71,
@@ -11579,7 +11579,7 @@
     "seats": 2,
     "doors": 3,
     "type": "automobile",
-    "price": 65410
+    "price": 0
   },
   "tampa3": {
     "isUsedInServer": false,
@@ -11660,7 +11660,7 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 4650
+    "price": 14800
   },
   "tcheburek": {
     "isUsedInServer": true,
@@ -11676,7 +11676,7 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 9500
   },
   "technical": {
     "isUsedInServer": false,
@@ -12515,7 +12515,7 @@
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 0
+    "price": 49800
   },
   "tribike": {
     "isUsedInServer": true,
@@ -13674,8 +13674,8 @@
     "price": 22690
   },
   "yosemite2": {
-    "isUsedInServer": true,
-    "isPlayerAllowed": true,
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.395,
     "braking": 0.85,
     "handling": 0.775,
@@ -13687,7 +13687,7 @@
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 27450
+    "price": 0
   },
   "yosemite3": {
     "isUsedInServer": true,
