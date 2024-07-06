@@ -163,7 +163,7 @@ setInterval(async () => {
 					const properties = await triggerClientCallback('ceeb_vehicle:getProperties', ownerId, vehicle.netId);
 					if (properties) vehicle.set('properties', properties);
 				} catch (error) {
-					console.error('Error in triggerClientCallback:', error);
+					// console.error('Error in triggerClientCallback:', error);
 				}
 			}
 			if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity)) {
