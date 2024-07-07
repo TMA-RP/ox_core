@@ -104,8 +104,8 @@ export class OxVehicle extends ClassInterface {
 					parameters.push(vehicle.#getSaveData());
 				}
 
-				if (despawn) console.log("[ox_core] Despawning vehicle with plate " + vehicle.plate + " because there is a saveAll with despawn option to true")
-				if (despawn) console.log("[ox_core] Resource", resource)
+				if (despawn) console.log("[ceeb_debug][ox_core] Despawning vehicle with plate " + vehicle.plate + " because there is a saveAll with despawn option to true")
+				if (despawn) console.log("[ceeb_debug][ox_core] Resource", resource)
 				if (despawn) vehicle.despawn();
 			}
 		}
@@ -176,16 +176,15 @@ export class OxVehicle extends ClassInterface {
 	}
 
 	async despawn(save?: boolean) {
+		console.log("[ceeb_debug][ox_core] has received a despawn request for vehicle with plate " + this.plate + " with save option " + (save ? "true" : "false"))
+		console.log(`#############################################`);
+
 		const saveData = save && this.#getSaveData();
 		if (saveData) SaveVehicleData(saveData);
 		let occupants: number[] = [];
 		if (DoesEntityExist(this.entity)) {
 			occupants = GetPedsInVehicle(this.entity);
 			occupants.forEach((ped) => TaskLeaveVehicle(ped, this.entity, 64));
-			if (this.get('stretcher')) {
-				const stretcher = NetworkGetEntityFromNetworkId(this.get('stretcher'))
-				DeleteEntity(stretcher)
-			}
 		}
 		if (occupants.length > 0) await sleep(1500);
 		if (DoesEntityExist(this.entity)) DeleteEntity(this.entity);

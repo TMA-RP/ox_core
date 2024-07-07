@@ -7,6 +7,7 @@ on('entityRemoved', (entityId: number) => {
 
 	if (!vehicle) return;
 
-	console.log(`[OX] Vehicle with ${vehicle.plate}) has received entityRemoved event.`);
+	console.log(`[ceeb_debug][OX] Vehicle with ${vehicle.plate}) has received entityRemoved event.`);
+	console.log(`#############################################`);
 	vehicle.setStored('impound', true);
 });
