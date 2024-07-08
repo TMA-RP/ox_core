@@ -1,5 +1,5 @@
 import { OxPlayer, PlayerInstance } from 'player/class';
-import { CreateUser, GetUserIdFromIdentifier, GetCharacters } from './db';
+import { CreateUser, GetUserIdFromIdentifier } from './db';
 import { GetIdentifiers, GetPlayerLicense } from 'utils';
 import { DEBUG, SV_LAN } from '../config';
 import type { Dict } from 'types';
