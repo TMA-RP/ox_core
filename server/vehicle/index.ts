@@ -43,7 +43,7 @@ export async function CreateVehicle(
 				return vehicle;
 			}
 
-			console.log("[ceeb_debug][ox_core] Despawning vehicle with plate in order to respawn it " + vehicle.plate)
+			// console.log("[ceeb_debug][ox_core] Despawning vehicle with plate in order to respawn it " + vehicle.plate)
 			vehicle.despawn(true);
 		}
 	}
@@ -84,16 +84,15 @@ export async function CreateVehicle(
 	if (data.vin && !data.owner && !data.group) delete data.vin;
 
 	let plateChanged = false;
+	let oldPlate = data.plate || "";
 	if (!data.plate || !data.id && data.plate && (data.owner || data.group)) {
-		if (data.plate && (await IsPlateAvailable(data.plate))) {
-			data.plate = data.plate;
-		} else {
+		if (!data.plate || (await IsPlateAvailable(data.plate))) {
 			data.plate = await OxVehicle.generatePlate();
 			plateChanged = true;
 		}
-	} else {
-		data.plate = data.plate;
 	}
+
+	if (plateChanged && data.id) console.log(`[ceeb_debug] Vehicle id [${data.id}] has changed plate from [${oldPlate}] to [${data.plate}]`);
 
 	const metadata = data.data || ({} as { properties: VehicleProperties;[key: string]: any });
 	metadata.properties = metadata.properties ? metadata.properties : data.properties ? data.properties : {};

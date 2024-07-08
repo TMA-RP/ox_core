@@ -104,8 +104,8 @@ export class OxVehicle extends ClassInterface {
 					parameters.push(vehicle.#getSaveData());
 				}
 
-				if (despawn) console.log("[ceeb_debug][ox_core] Despawning vehicle with plate " + vehicle.plate + " because there is a saveAll with despawn option to true")
-				if (despawn) console.log("[ceeb_debug][ox_core] Resource", resource)
+				// if (despawn) console.log("[ceeb_debug][ox_core] Despawning vehicle with plate " + vehicle.plate + " because there is a saveAll with despawn option to true")
+				// if (despawn) console.log("[ceeb_debug][ox_core] Resource", resource)
 				if (despawn) vehicle.despawn();
 			}
 		}
@@ -176,8 +176,8 @@ export class OxVehicle extends ClassInterface {
 	}
 
 	async despawn(save?: boolean) {
-		console.log("[ceeb_debug][ox_core] has received a despawn request for vehicle with plate " + this.plate + " with save option " + (save ? "true" : "false"))
-		console.log(`#############################################`);
+		// console.log("[ceeb_debug][ox_core] has received a despawn request for vehicle with plate " + this.plate + " with save option " + (save ? "true" : "false"))
+		// console.log(`#############################################`);
 
 		const saveData = save && this.#getSaveData();
 		if (saveData) SaveVehicleData(saveData);
