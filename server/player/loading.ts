@@ -28,8 +28,8 @@ async function loadPlayer(playerId: number) {
 		if (userId && OxPlayer.getFromUserId(userId)) return kickReason;
 	}
 
-	const characters = await GetCharacters(userId!)
-	if (!characters || !characters.length || characters.length == 0) return `Ce test est réservé aux personnes ayant déjà un personnage créé.`;
+	// const characters = await GetCharacters(userId!)
+	// if (!characters || !characters.length || characters.length == 0) return `Ce test est réservé aux personnes ayant déjà un personnage créé.`;
 
 	player.username = GetPlayerName(player.source as string);
 	player.userId = userId ? userId : await CreateUser(player.username, GetIdentifiers(playerId));
