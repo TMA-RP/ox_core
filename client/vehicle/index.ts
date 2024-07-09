@@ -5,61 +5,61 @@ import { DEBUG } from '../config';
 if (DEBUG) import('./parser');
 
 onServerCallback('ox:getNearbyVehicles', (radius: number) => {
-  const nearbyEntities: number[] = [];
-  const playerCoords = Vector3.fromArray(GetEntityCoords(cache.ped, true));
+	const nearbyEntities: number[] = [];
+	const playerCoords = Vector3.fromArray(GetEntityCoords(cache.ped, true));
 
-  (GetGamePool('CVehicle') as number[]).forEach((entityId) => {
-    const coords = Vector3.fromArray(GetEntityCoords(entityId, true));
-    const distance = coords.distance(playerCoords);
+	(GetGamePool('CVehicle') as number[]).forEach((entityId) => {
+		const coords = Vector3.fromArray(GetEntityCoords(entityId, true));
+		const distance = coords.distance(playerCoords);
 
-    if (distance <= (radius || 2) && NetworkGetEntityIsNetworked(entityId)) nearbyEntities.push(VehToNet(entityId));
-  });
+		if (distance <= (radius || 2) && NetworkGetEntityIsNetworked(entityId)) nearbyEntities.push(VehToNet(entityId));
+	});
 
-  return nearbyEntities;
+	return nearbyEntities;
 });
 
 AddStateBagChangeHandler('initVehicle', '', async (bagName: string, key: string, value: any) => {
-  if (!value) return;
+	if (!value) return;
 
-  const entity = await waitFor(async () => {
-    const entity = GetEntityFromStateBagName(bagName);
-    DEV: console.info(key, entity);
+	const entity = await waitFor(async () => {
+		const entity = GetEntityFromStateBagName(bagName);
+		DEV: console.info(key, entity);
 
-    if (entity) return entity;
-  }, 'failed to get entity from statebag name');
+		if (entity) return entity;
+	}, 'failed to get entity from statebag name');
 
-  if (!entity) return;
+	if (!entity) return;
 
-  await waitFor(async () => {
-    if (!IsEntityWaitingForWorldCollision(entity)) return true;
-  }, 'failed to wait for world collision');
+	await waitFor(async () => {
+		if (!IsEntityWaitingForWorldCollision(entity)) return true;
+	}, 'failed to wait for world collision');
 
-  if (NetworkGetEntityOwner(entity) !== cache.playerId) return;
+	if (NetworkGetEntityOwner(entity) !== cache.playerId) return;
 
-  SetVehicleOnGroundProperly(entity);
-  setTimeout(() => Entity(entity).state.set(key, null, true));
+	SetVehicleOnGroundProperly(entity);
+	setTimeout(() => Entity(entity).state.set(key, null, true));
 });
 
 AddStateBagChangeHandler('vehicleProperties', '', async (bagName: string, key: string, value: any) => {
-  if (!value) return DEBUG && console.info(`removed ${key} state from ${bagName}`);
+	if (!value) return DEBUG && console.info(`removed ${key} state from ${bagName}`);
 
-  const entity = await waitFor(async () => {
-    const entity = GetEntityFromStateBagName(bagName);
-    DEV: console.info(key, entity);
+	const entity = await waitFor(async () => {
+		const entity = GetEntityFromStateBagName(bagName);
+		DEV: console.info(key, entity);
 
-    if (entity) return entity;
-  }, 'failed to get entity from statebag name');
+		if (entity) return entity;
+	}, 'failed to get entity from statebag name');
 
-  if (!entity) return;
+	if (!entity) return;
 
-  if (setVehicleProperties(entity, value)) {
-    setTimeout(() => Entity(entity).state.set(key, null, true));
-  }
+	if (setVehicleProperties(entity, value)) {
+		setTimeout(() => Entity(entity).state.set(key, null, true));
+	}
 });
 
 onNet('ox_core:vehicle:enter', async (netId: number) => {
-    while(!NetworkGetEntityFromNetworkId(netId)) await sleep(0);
-    const vehicle = NetworkGetEntityFromNetworkId(netId);
-    while (!DoesEntityExist(vehicle)) await sleep(0);
-    TaskWarpPedIntoVehicle(cache.ped, vehicle, -1);
+	while (!NetworkDoesEntityExistWithNetworkId(netId)) await sleep(0);
+	const vehicle = NetworkGetEntityFromNetworkId(netId);
+	while (!DoesEntityExist(vehicle)) await sleep(0);
+	TaskWarpPedIntoVehicle(cache.ped, vehicle, -1);
 });
