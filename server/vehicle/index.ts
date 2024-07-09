@@ -156,7 +156,7 @@ export async function SpawnVehicle(id: number, coords: number | number[], headin
 setInterval(async () => {
 	for (const key of Object.keys(OxVehicle.getAll())) {
 		const vehicle = OxVehicle.get(key);
-		if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity)) {
+		if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity) && Entity(vehicle.entity).state.initVehicle !== true) {
 			const ownerId = NetworkGetEntityOwner(NetworkGetEntityFromNetworkId(vehicle.netId));
 			if (ownerId && ownerId !== -1) {
 				try {
@@ -166,7 +166,7 @@ setInterval(async () => {
 					// console.error('Error in triggerClientCallback:', error);
 				}
 			}
-			if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity)) {
+			if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity) && Entity(vehicle.entity).state.initVehicle !== true) {
 				const coords = GetEntityCoords(vehicle.entity);
 				const heading = GetEntityHeading(vehicle.entity);
 				vehicle.set('coords', [coords[0], coords[1], coords[2], heading]);
