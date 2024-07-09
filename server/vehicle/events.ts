@@ -11,6 +11,7 @@ on('entityRemoved', (entityId: number) => {
 	if (!vehicleId) {
 		console.log(`[ceeb_debug][OX] Vehicle with plate ${vehicle.plate} has no vehicleId.`);
 		console.log(`#############################################`);
+		emit('ox:vehicleDeleted', entityId)
 		return
 	}
 	const coords = vehicle.get("coords");
