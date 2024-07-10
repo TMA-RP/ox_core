@@ -1,4 +1,4 @@
-import { cache, onServerCallback, setVehicleProperties, waitFor, sleep } from '@overextended/ox_lib/client';
+import { cache, onServerCallback, setVehicleProperties, getVehicleProperties, waitFor, sleep } from '@overextended/ox_lib/client';
 import { Vector3 } from '@nativewrappers/fivem';
 import { DEBUG } from '../config';
 
@@ -51,8 +51,13 @@ AddStateBagChangeHandler('vehicleProperties', '', async (bagName: string, key: s
 	}, 'failed to get entity from statebag name');
 
 	if (!entity) return;
-
 	if (setVehicleProperties(entity, value)) {
+		const currentProperties = getVehicleProperties(entity);
+		let diff = [];
+		for (const [curKey, curValue] of Object.entries(currentProperties)) {
+			if (value[curKey] !== curValue) diff.push(curKey);
+		}
+		if (diff.length > 0) console.warn(`Failed to set vehicle properties: ${diff.join(', ')}`);
 		setTimeout(() => Entity(entity).state.set(key, null, true));
 	}
 });
