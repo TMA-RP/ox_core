@@ -153,7 +153,7 @@ export async function SpawnVehicle(id: number, coords: number | number[], headin
 	return await CreateVehicle(vehicle, coords, heading, invokingScript);
 }
 
-function object_equals(x, y) {
+function object_equals(x: any, y: any) {
 	if (x === y) return true;
 	// if both x and y are null or undefined and exactly the same
 
