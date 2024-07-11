@@ -57,7 +57,7 @@ AddStateBagChangeHandler('vehicleProperties', '', async (bagName: string, key: s
 		for (const [curKey, curValue] of Object.entries(currentProperties)) {
 			if (value[curKey] !== curValue) diff.push(curKey);
 		}
-		if (diff.length > 0) console.warn(`Failed to set vehicle properties: ${diff.join(', ')}`);
+		if (diff.length > 0) return console.warn(`Failed to set vehicle properties: ${diff.join(', ')}`);
 		setTimeout(() => Entity(entity).state.set(key, null, true));
 	}
 });
