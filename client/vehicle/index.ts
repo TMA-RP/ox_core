@@ -91,11 +91,10 @@ AddStateBagChangeHandler('vehicleProperties', '', async (bagName: string, key: s
 		const currentProperties: any = getVehicleProperties(entity);
 		const changedKeys = []
 		for (const key in currentProperties) {
-			if (!object_equals(currentProperties[key], value[key])) {
-				changedKeys.push(key);
-			}
+			if (!object_equals(currentProperties[key], value[key])) changedKeys.push(key);
 		}
-		if (changedKeys.length > 0) return console.warn(`Failed to set vehicle properties: ${changedKeys.join(', ')}`);
+		if (changedKeys.length > 0) return console.warn(`Vehicle with plate ${value.plate} has not been updated properly.`);
+		console.warn(`Vehicle with plate ${value.plate} has been updated properly.`);
 		setTimeout(() => Entity(entity).state.set(key, null, true));
 	}
 });
