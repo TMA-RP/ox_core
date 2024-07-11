@@ -212,8 +212,8 @@ setInterval(async () => {
 							changedKeys.forEach((key) => {
 								console.log(`[ceeb_debug] ${key}: ${currentProperties[key]} -> ${properties[key]}`);
 							})
+							vehicle.set('properties', properties);
 						}
-						vehicle.set('properties', properties);
 					}
 				} catch (error) {
 					// console.error('Error in triggerClientCallback:', error);
