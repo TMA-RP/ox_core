@@ -30,10 +30,13 @@ AddStateBagChangeHandler('initVehicle', '', async (bagName: string, key: string,
 
 	if (!entity) return;
 
-	await waitFor(async () => {
-		if (!IsEntityWaitingForWorldCollision(entity)) return true;
-	}, 'failed to wait for world collision');
-
+	try {
+		await waitFor(async () => {
+			if (!IsEntityWaitingForWorldCollision(entity)) return true;
+		}, 'failed to wait for world collision');
+	} catch (e) {
+		// console.error(e);
+	}
 	if (NetworkGetEntityOwner(entity) !== cache.playerId) return;
 
 	SetVehicleOnGroundProperly(entity);
@@ -71,26 +74,24 @@ AddStateBagChangeHandler('vehicleProperties', '', async (bagName: string, key: s
 
 	// properties and serverside vehicles are one of the most retarded features of fivem
 	// let's set this dumb bullshit in an interval and see if they actually bother setting
-	await new Promise((resolve) => {
-		let i = 0;
-		let interval: CitizenTimer;
-
-		interval = setInterval(() => {
-			i++;
+	let hasBeenCorrectlySet = false;
+	let i = 0;
+	while (i < 10) {
+		i++;
+		try {
 			setVehicleProperties(entity, value);
-
-			if (i > 10) {
-				resolve(1);
-				clearInterval(interval);
-			}
-		}, 100);
-	});
-
-	const properties = getVehicleProperties(entity);
-
-	if (!doesfivemworkyet(value, properties))
-		console.error(`vehicle properties probably didn't fully set properly. thanks fivem.`);
-
+		} catch (e) {
+			console.error(e);
+		}
+		const properties = getVehicleProperties(entity);
+		if (doesfivemworkyet(value, properties)) {
+			hasBeenCorrectlySet = true;
+			break;
+		}
+		await sleep(100);
+	}
+	if (!hasBeenCorrectlySet) return console.error(`vehicle properties probably didn't fully set properly. thanks fivem.`);
+	// Early return to avoid clear state and then consider server side that the vehicle is initialized and rewrite shit data in db
 	Entity(entity).state.set(key, null, true);
 });
 
