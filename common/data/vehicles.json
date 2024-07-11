@@ -4486,7 +4486,7 @@
     "seats": 2,
     "doors": 1,
     "type": "bike",
-    "price": 1100
+    "price": 1500
   },
   "fbi": {
     "isUsedInServer": false,
@@ -4553,7 +4553,7 @@
     "price": 16300
   },
   "fdtruck": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.12,
     "braking": 0.25,
@@ -4566,7 +4566,7 @@
     "seats": 2,
     "doors": 5,
     "type": "automobile",
-    "price": 0
+    "price": 31200
   },
   "felon": {
     "isUsedInServer": true,
