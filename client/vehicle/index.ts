@@ -66,14 +66,28 @@ AddStateBagChangeHandler('vehicleProperties', '', async (bagName: string, key: s
 	const entity = GetEntityFromStateBagName(bagName);
 	if (entity === 0) return console.error(`failed to get entity from statebag name ${bagName}`);
 
-	try {
-		setVehicleProperties(entity, value);
-	} catch (e) {
-		return console.error(e);
+	let hasBeenCorrectlySet = false;
+	let i = 0
+	while (i < 10) {
+		if (DoesEntityExist(entity)) {
+			try {
+				setVehicleProperties(entity, value);
+			} catch (e) {
+				// return console.error(e);
+			}
+
+			if (DoesEntityExist(entity) && doesfivemworkyet(value, getVehicleProperties(entity))) {
+				hasBeenCorrectlySet = true;
+				break;
+			}
+		}
+
+		i++;
+		await sleep(100);
 	}
 
-	const properties = getVehicleProperties(entity);
-	if (doesfivemworkyet(value, properties)) return console.error(`vehicle properties probably didn't fully set properly. thanks fivem.`);
+	if (!hasBeenCorrectlySet) return console.error(`vehicle ${value.plate} properties probably didn't fully set properly. thanks fivem.`);
+	console.log(`vehicle ${value.plate} properties set properly`);
 	// Early return to avoid clear state and then consider server side that the vehicle is initialized and rewrite shit data in db
 	Entity(entity).state.set(key, null, true);
 });
