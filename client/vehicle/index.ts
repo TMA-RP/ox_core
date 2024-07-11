@@ -63,34 +63,17 @@ function doesfivemworkyet(obj1: any, obj2: any) {
 AddStateBagChangeHandler('vehicleProperties', '', async (bagName: string, key: string, value: any) => {
 	if (!value) return DEBUG && console.info(`removed ${key} state from ${bagName}`);
 
-	const entity = await waitFor(async () => {
-		const entity = GetEntityFromStateBagName(bagName);
-		DEV: console.info(key, entity);
+	const entity = GetEntityFromStateBagName(bagName);
+	if (entity === 0) return console.error(`failed to get entity from statebag name ${bagName}`);
 
-		if (entity) return entity;
-	}, 'failed to get entity from statebag name');
-
-	if (!entity) return;
-
-	// properties and serverside vehicles are one of the most retarded features of fivem
-	// let's set this dumb bullshit in an interval and see if they actually bother setting
-	let hasBeenCorrectlySet = false;
-	let i = 0;
-	while (i < 10) {
-		i++;
-		try {
-			setVehicleProperties(entity, value);
-		} catch (e) {
-			console.error(e);
-		}
-		const properties = getVehicleProperties(entity);
-		if (doesfivemworkyet(value, properties)) {
-			hasBeenCorrectlySet = true;
-			break;
-		}
-		await sleep(100);
+	try {
+		setVehicleProperties(entity, value);
+	} catch (e) {
+		return console.error(e);
 	}
-	if (!hasBeenCorrectlySet) return console.error(`vehicle properties probably didn't fully set properly. thanks fivem.`);
+
+	const properties = getVehicleProperties(entity);
+	if (doesfivemworkyet(value, properties)) return console.error(`vehicle properties probably didn't fully set properly. thanks fivem.`);
 	// Early return to avoid clear state and then consider server side that the vehicle is initialized and rewrite shit data in db
 	Entity(entity).state.set(key, null, true);
 });
