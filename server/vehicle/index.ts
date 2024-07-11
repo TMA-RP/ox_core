@@ -153,23 +153,6 @@ export async function SpawnVehicle(id: number, coords: number | number[], headin
 	return await CreateVehicle(vehicle, coords, heading, invokingScript);
 }
 
-function doesfivemworkyet(obj1: any, obj2: any) {
-	for (let key in obj1) {
-		if (obj1.hasOwnProperty(key)) {
-			if (typeof obj1[key] === 'object' && obj1[key] !== null) {
-				if (!doesfivemworkyet(obj1[key], obj2[key])) {
-					return false;
-				}
-			} else {
-				if (obj2[key] !== obj1[key]) {
-					return false;
-				}
-			}
-		}
-	}
-	return true;
-}
-
 setInterval(async () => {
 	for (const key of Object.keys(OxVehicle.getAll())) {
 		const vehicle = OxVehicle.get(key);
@@ -180,27 +163,16 @@ setInterval(async () => {
 					const properties: any = await triggerClientCallback('ceeb_vehicle:getProperties', ownerId, vehicle.netId);
 					if (properties) {
 						const currentProperties = vehicle.get('properties');
-						// test if the values have changed and return keys that have changed
-						const changedKeys = []
-						for (const key in properties) {
-							if (!doesfivemworkyet(currentProperties[key], properties[key])) {
-								changedKeys.push(key);
-							}
+						if (properties.plate !== currentProperties.plate) {
+							console.log(`[ceeb_debug] Vehicle id [${vehicle.id}] has changed plate from [${currentProperties.plate}] to [${properties.plate}]`)
 						}
-						if (changedKeys.length > 0) {
-							console.log("####################################################")
-							console.log(`[ceeb_debug] Vehicle ${vehicle.id} properties changed: ${changedKeys.join(', ')}`);
-							changedKeys.forEach((key) => {
-								console.log(`[ceeb_debug] ${key}: ${currentProperties[key]} -> ${properties[key]}`);
-							})
-							vehicle.set('properties', properties);
-						}
+						vehicle.set('properties', properties);
 					}
 				} catch (error) {
 					// console.error('Error in triggerClientCallback:', error);
 				}
 			}
-			if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity) && !Entity(vehicle.entity).state.vehicleProperties) {
+			if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity)) {
 				const coords = GetEntityCoords(vehicle.entity);
 				const heading = GetEntityHeading(vehicle.entity);
 				vehicle.set('coords', [coords[0], coords[1], coords[2], heading]);

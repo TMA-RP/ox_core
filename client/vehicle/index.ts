@@ -1,4 +1,4 @@
-import { cache, onServerCallback, setVehicleProperties, getVehicleProperties, waitFor, sleep } from '@overextended/ox_lib/client';
+import { cache, onServerCallback, setVehicleProperties, sleep } from '@overextended/ox_lib/client';
 import { Vector3 } from '@nativewrappers/fivem';
 import { DEBUG } from '../config';
 
@@ -20,75 +20,19 @@ onServerCallback('ox:getNearbyVehicles', (radius: number) => {
 
 AddStateBagChangeHandler('initVehicle', '', async (bagName: string, key: string, value: any) => {
 	if (!value) return;
-
-	const entity = await waitFor(async () => {
-		const entity = GetEntityFromStateBagName(bagName);
-		DEV: console.info(key, entity);
-
-		if (entity) return entity;
-	}, 'failed to get entity from statebag name');
-
-	if (!entity) return;
-
-	try {
-		await waitFor(async () => {
-			if (!IsEntityWaitingForWorldCollision(entity)) return true;
-		}, 'failed to wait for world collision');
-	} catch (e) {
-		// console.error(e);
-	}
-	if (NetworkGetEntityOwner(entity) !== cache.playerId) return;
-
-	SetVehicleOnGroundProperly(entity);
-	setTimeout(() => Entity(entity).state.set(key, null, true));
+	const netId = parseInt(bagName.split(':')[1]);
+	if (!NetworkDoesEntityExistWithNetworkId(netId)) return;
+	const vehicle = NetworkGetEntityFromNetworkId(netId);
+	SetVehicleOnGroundProperly(vehicle);
+	setTimeout(() => Entity(vehicle).state.set(key, null, true));
 });
 
-function doesfivemworkyet(obj1: any, obj2: any) {
-	for (let key in obj1) {
-		if (obj1.hasOwnProperty(key)) {
-			if (typeof obj1[key] === 'object' && obj1[key] !== null) {
-				if (!doesfivemworkyet(obj1[key], obj2[key])) {
-					return false;
-				}
-			} else {
-				if (obj2[key] !== obj1[key]) {
-					return false;
-				}
-			}
-		}
-	}
-	return true;
-}
-
 AddStateBagChangeHandler('vehicleProperties', '', async (bagName: string, key: string, value: any) => {
-	if (!value) return DEBUG && console.info(`removed ${key} state from ${bagName}`);
-
-	const entity = GetEntityFromStateBagName(bagName);
-	if (entity === 0) return console.error(`failed to get entity from statebag name ${bagName}`);
-
-	let hasBeenCorrectlySet = false;
-	let i = 0
-	while (i < 10) {
-		if (DoesEntityExist(entity)) {
-			try {
-				setVehicleProperties(entity, value);
-			} catch (e) {
-				// return console.error(e);
-			}
-
-			if (DoesEntityExist(entity) && doesfivemworkyet(value, getVehicleProperties(entity))) {
-				hasBeenCorrectlySet = true;
-				break;
-			}
-		}
-
-		i++;
-		await sleep(100);
-	}
-
-	if (!hasBeenCorrectlySet) return console.error(`vehicle ${value.plate} properties probably didn't fully set properly. thanks fivem.`);
-	// Early return to avoid clear state and then consider server side that the vehicle is initialized and rewrite shit data in db
-	Entity(entity).state.set(key, null, true);
+	if (!value) return;
+	const netId = parseInt(bagName.split(':')[1]);
+	if (!NetworkDoesEntityExistWithNetworkId(netId)) return;
+	const vehicle = NetworkGetEntityFromNetworkId(netId);
+	if (setVehicleProperties(vehicle, value)) Entity(vehicle).state.set(key, null, true);
 });
 
 onNet('ox_core:vehicle:enter', async (netId: number) => {
