@@ -4,6 +4,42 @@ import { DEBUG } from '../config';
 
 if (DEBUG) import('./parser');
 
+function object_equals(x: any, y: any) {
+	if (x === y) return true;
+	// if both x and y are null or undefined and exactly the same
+
+	if (!(x instanceof Object) || !(y instanceof Object)) return false;
+	// if they are not strictly equal, they both need to be Objects
+
+	if (x.constructor !== y.constructor) return false;
+	// they must have the exact same prototype chain, the closest we can do is
+	// test there constructor.
+
+	for (var p in x) {
+		if (!x.hasOwnProperty(p)) continue;
+		// other properties were tested using x.constructor === y.constructor
+
+		if (!y.hasOwnProperty(p)) return false;
+		// allows to compare x[ p ] and y[ p ] when set to undefined
+
+		if (x[p] === y[p]) continue;
+		// if they have the same strict value or identity then they are equal
+
+		if (typeof (x[p]) !== "object") return false;
+		// Numbers, Strings, Functions, Booleans must be strictly equal
+
+		if (!object_equals(x[p], y[p])) return false;
+		// Objects and Arrays must be tested recursively
+	}
+
+	for (p in y)
+		if (y.hasOwnProperty(p) && !x.hasOwnProperty(p))
+			return false;
+	// allows x[ p ] to be set to undefined
+
+	return true;
+}
+
 onServerCallback('ox:getNearbyVehicles', (radius: number) => {
 	const nearbyEntities: number[] = [];
 	const playerCoords = Vector3.fromArray(GetEntityCoords(cache.ped, true));
@@ -52,12 +88,14 @@ AddStateBagChangeHandler('vehicleProperties', '', async (bagName: string, key: s
 
 	if (!entity) return;
 	if (setVehicleProperties(entity, value)) {
-		const currentProperties = getVehicleProperties(entity);
-		let diff = [];
-		for (const [curKey, curValue] of Object.entries(currentProperties)) {
-			if (value[curKey] !== curValue) diff.push(curKey);
+		const currentProperties: any = getVehicleProperties(entity);
+		const changedKeys = []
+		for (const key in currentProperties) {
+			if (!object_equals(currentProperties[key], value[key])) {
+				changedKeys.push(key);
+			}
 		}
-		if (diff.length > 0) return console.warn(`Failed to set vehicle properties: ${diff.join(', ')}`);
+		if (changedKeys.length > 0) return console.warn(`Failed to set vehicle properties: ${changedKeys.join(', ')}`);
 		setTimeout(() => Entity(entity).state.set(key, null, true));
 	}
 });
