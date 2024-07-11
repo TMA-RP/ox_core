@@ -160,11 +160,16 @@ setInterval(async () => {
 			const ownerId = NetworkGetEntityOwner(NetworkGetEntityFromNetworkId(vehicle.netId));
 			if (ownerId && ownerId !== -1) {
 				try {
-					const properties = await triggerClientCallback('ceeb_vehicle:getProperties', ownerId, vehicle.netId);
+					const properties: any = await triggerClientCallback('ceeb_vehicle:getProperties', ownerId, vehicle.netId);
 					if (properties) {
 						const currentProperties = vehicle.get('properties');
 						// test if the values have changed and return keys that have changed
-						const changedKeys = Object.keys(properties).filter(key => properties[key] !== currentProperties[key]);
+						const changedKeys = []
+						for (const key in properties) {
+							if (currentProperties[key] !== properties[key]) {
+								changedKeys.push(key);
+							}
+						}
 						if (changedKeys.length > 0) {
 							console.log(`[ceeb_debug] Vehicle ${vehicle.id} properties changed: ${changedKeys.join(', ')}`);
 						}
