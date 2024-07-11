@@ -87,7 +87,6 @@ AddStateBagChangeHandler('vehicleProperties', '', async (bagName: string, key: s
 	}
 
 	if (!hasBeenCorrectlySet) return console.error(`vehicle ${value.plate} properties probably didn't fully set properly. thanks fivem.`);
-	console.log(`vehicle ${value.plate} properties set properly`);
 	// Early return to avoid clear state and then consider server side that the vehicle is initialized and rewrite shit data in db
 	Entity(entity).state.set(key, null, true);
 });
