@@ -156,12 +156,20 @@ export async function SpawnVehicle(id: number, coords: number | number[], headin
 setInterval(async () => {
 	for (const key of Object.keys(OxVehicle.getAll())) {
 		const vehicle = OxVehicle.get(key);
-		if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity) && !Entity(vehicle.entity).state.vehicleProperties) {
+		if (vehicle && vehicle.id && vehicle.entity && DoesEntityExist(vehicle.entity) && !Entity(vehicle.entity).state.vehicleProperties) {
 			const ownerId = NetworkGetEntityOwner(NetworkGetEntityFromNetworkId(vehicle.netId));
 			if (ownerId && ownerId !== -1) {
 				try {
 					const properties = await triggerClientCallback('ceeb_vehicle:getProperties', ownerId, vehicle.netId);
-					if (properties) vehicle.set('properties', properties);
+					if (properties) {
+						const currentProperties = vehicle.get('properties');
+						// test if the values have changed and return keys that have changed
+						const changedKeys = Object.keys(properties).filter(key => properties[key] !== currentProperties[key]);
+						if (changedKeys.length > 0) {
+							console.log(`[ceeb_debug] Vehicle ${vehicle.id} properties changed: ${changedKeys.join(', ')}`);
+						}
+						vehicle.set('properties', properties);
+					}
 				} catch (error) {
 					// console.error('Error in triggerClientCallback:', error);
 				}
