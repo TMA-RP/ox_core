@@ -147,7 +147,7 @@ export class OxVehicle extends ClassInterface {
 		this.#stored = stored;
 
 		OxVehicle.add(this.entity, this);
-		SetVehicleNumberPlateText(this.entity, this.plate);
+		SetVehicleNumberPlateText(this.entity, "WAITING ");
 		emit('ox:spawnedVehicle', this.entity, this.id);
 	}
 

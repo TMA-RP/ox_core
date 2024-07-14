@@ -156,7 +156,7 @@ export async function SpawnVehicle(id: number, coords: number | number[], headin
 setInterval(async () => {
 	for (const key of Object.keys(OxVehicle.getAll())) {
 		const vehicle = OxVehicle.get(key);
-		if (vehicle && vehicle.id && vehicle.entity && DoesEntityExist(vehicle.entity) && !Entity(vehicle.entity).state.vehicleProperties) {
+		if (vehicle && vehicle.id && vehicle.entity && DoesEntityExist(vehicle.entity) && Entity(vehicle.entity).state.vehicleProperties === false) {
 			const ownerId = NetworkGetEntityOwner(NetworkGetEntityFromNetworkId(vehicle.netId));
 			if (ownerId && ownerId !== -1) {
 				try {
