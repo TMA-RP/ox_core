@@ -167,6 +167,11 @@ export class OxVehicle extends ClassInterface {
 
 	#getSaveData() {
 		if (!this.id) return;
+		if (this.entity && DoesEntityExist(this.entity) && Entity(this.entity).state.vehicleProperties === false) {
+			const coords = GetEntityCoords(this.entity);
+			const heading = GetEntityHeading(this.entity);
+			this.set('coords', [coords[0], coords[1], coords[2], heading]);
+		}
 		return [this.#stored, JSON.stringify(this.#metadata), this.id];
 	}
 
