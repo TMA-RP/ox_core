@@ -405,9 +405,14 @@ export class OxPlayer extends ClassInterface {
 			if (!['isDead', 'phoneNumber', 'dateOfBirth', 'gender', 'name', 'firstName', 'lastName'].includes(key)) metadataToSave[key] = this.#metadata[key];
 		}
 		metadataToSave['deathTimestamp'] = Player(this.source).state.deathTimestamp;
+		let coords = GetEntityCoords(this.ped);
+		let heading = GetEntityHeading(this.ped);
+		// Let's make make 3 decimals for coords and 2 for heading
+		coords = coords.map((v) => parseFloat(v.toFixed(3)));
+		heading = parseFloat(heading.toFixed(3));
 		return [
-			...GetEntityCoords(this.ped),
-			GetEntityHeading(this.ped),
+			...coords,
+			heading,
 			Player(this.source).state.isDead || false,
 			GetEntityHealth(this.ped),
 			GetPedArmour(this.ped),
