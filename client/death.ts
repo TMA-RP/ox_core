@@ -83,8 +83,9 @@ function IsPlayingAllowedAnim() {
 }
 
 async function OnPlayerDeath() {
+	emitNet("ceeb_job:newDeath");
 	OxPlayer.state.set("isDead", true, true);
-	const newTimestamp = Date.now() + 5 * 60 * 1000; // 5 minutes
+	const newTimestamp = Date.now() + 15 * 60 * 1000; // 15 minutes
 	const oldTimestamp = OxPlayer.state.deathTimestamp;
 	const timestamp = oldTimestamp ? oldTimestamp : newTimestamp;
 	if (!oldTimestamp) OxPlayer.state.set("deathTimestamp", newTimestamp, true);
@@ -131,14 +132,16 @@ async function OnPlayerDeath() {
 		} else {
 			helpNotify("~INPUT_PICKUP~ pour être réanimé par l'unité X");
 			if (IsControlJustReleased(0, 38)) {
-				const canBeRevived = await triggerServerCallback("ceeb_job:canRevive", cache.serverId);
+				const canBeRevived = await triggerServerCallback("ceeb_job:canRevive", 0, cache.serverId);
 				if (canBeRevived) {
 					const ambulancePlayers = await triggerServerCallback<number>("ceeb_duty:getWorkingByJob", 0, "ambulance");
-					if (ambulancePlayers! <= 100) { // @TODOCEEB change this to a real value after ambulance job players are ready to work
+					if (ambulancePlayers! < 2) {
 						ClearDeath(tickId, true);
 					} else {
 						notify({ type: "error", description: "L'unité X est indisponible pour le moment" });
 					}
+				} else {
+					notify({ type: "error", description: "Vous ne pouvez pas être réanimé" });
 				}
 			}
 		}

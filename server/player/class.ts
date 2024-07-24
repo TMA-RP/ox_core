@@ -631,12 +631,9 @@ export class OxPlayer extends ClassInterface {
 		if (characterSlot === -1) return;
 
 		if (await DeleteCharacter(charId)) {
-			if (isActive) this.logout(false);
-			else this.#characters.splice(characterSlot, 1);
-
 			emit('ox:deletedCharacter', this.source, this.userId, charId);
 
-			DEV: console.info(`Deleted character ${this.charId} for OxPlayer<${this.userId}>`);
+			console.info(`Deleted character ${this.charId} for OxPlayer<${this.userId}>`);
 			return true;
 		}
 	}
