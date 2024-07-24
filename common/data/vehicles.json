@@ -1451,7 +1451,7 @@
     "price": 16500
   },
   "boxville": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.11,
     "braking": 0.25,
@@ -1464,7 +1464,7 @@
     "seats": 6,
     "doors": 5,
     "type": "automobile",
-    "price": 0
+    "price": 10290
   },
   "boxville2": {
     "isUsedInServer": false,
@@ -1964,7 +1964,7 @@
     "price": 55200
   },
   "burrito": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 0.16,
     "braking": 0.6,
@@ -1977,7 +1977,7 @@
     "seats": 4,
     "doors": 5,
     "type": "automobile",
-    "price": 0
+    "price": 17450
   },
   "burrito2": {
     "isUsedInServer": false,
