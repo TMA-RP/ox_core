@@ -82,15 +82,26 @@ function IsPlayingAllowedAnim() {
 	return false;
 }
 
+let waitingForDeath = false;
+
 async function OnPlayerDeath() {
-	emitNet("ceeb_job:newDeath");
-	OxPlayer.state.set("isDead", true, true);
+	if (waitingForDeath) return;
+	waitingForDeath = true;
+	if (!OxPlayer.state.isDead) {
+		emitNet("ceeb_job:newDeath");
+	}
 	const newTimestamp = Date.now() + 15 * 60 * 1000; // 15 minutes
+	const waitUntil = Date.now() + 1000;
+	while (!OxPlayer.state.deathTimestamp && Date.now() < waitUntil) {
+		await sleep(100);
+	}
 	const oldTimestamp = OxPlayer.state.deathTimestamp;
 	const timestamp = oldTimestamp ? oldTimestamp : newTimestamp;
 	if (!oldTimestamp) OxPlayer.state.set("deathTimestamp", newTimestamp, true);
 
+	OxPlayer.state.set("isDead", true, true);
 	playerIsDead = true;
+	waitingForDeath = false;
 
 	exports['pma-voice'].overrideProximityCheck(() => {
 		return false
