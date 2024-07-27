@@ -1,6 +1,7 @@
 import {
 	cache,
 	onServerCallback,
+	waitFor,
 } from '@overextended/ox_lib/client';
 import { Vector3 } from '@nativewrappers/fivem';
 import { DEBUG } from '../config';
@@ -21,3 +22,24 @@ onServerCallback('ox:getNearbyVehicles', (radius: number) => {
 	return nearbyEntities;
 });
 
+AddStateBagChangeHandler('initVehicle', '', async (bagName: string, key: string, value: any) => {
+	if (!value) return;
+
+	const entity = await waitFor(async () => {
+		const entity = GetEntityFromStateBagName(bagName);
+		DEV: console.info(key, entity);
+
+		if (entity) return entity;
+	}, 'failed to get entity from statebag name');
+
+	if (!entity) return;
+
+	await waitFor(async () => {
+		if (!IsEntityWaitingForWorldCollision(entity)) return true;
+	});
+
+	if (NetworkGetEntityOwner(entity) !== cache.playerId) return;
+
+	SetVehicleOnGroundProperly(entity);
+	setTimeout(() => Entity(entity).state.set(key, null, true));
+});

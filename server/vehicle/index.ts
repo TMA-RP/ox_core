@@ -2,12 +2,11 @@ import { OxVehicle } from './class';
 import { CreateNewVehicle, GetVehicleFromId, IsPlateAvailable, VehicleRow } from './db';
 import { GetVehicleData } from '../../common/vehicles';
 import { DEBUG } from '../../common/config';
-
 import './class';
 import './commands';
 import './events';
-import { VehicleProperties, sleep } from '@overextended/ox_lib';
-import { triggerClientCallback } from '@overextended/ox_lib/server';
+import { VehicleProperties, setVehicleProperties, triggerClientCallback } from '@overextended/ox_lib/server';
+import { sleep } from '@overextended/ox_lib';
 import { VectorFromBuffer } from '../../common';
 
 if (DEBUG) import('./parser');
@@ -92,7 +91,7 @@ export async function CreateVehicle(
 		}
 	}
 
-	if (plateChanged && data.id) console.log(`[ceeb_debug] Vehicle id [${data.id}] has changed plate from [${oldPlate}] to [${data.plate}]`);
+	if (plateChanged && data.id) console.log(`[ceeb_debug][vehicle_creation] Vehicle id [${data.id}] has changed plate from [${oldPlate}] to [${data.plate}]`);
 
 	const metadata = data.data || ({} as { properties: VehicleProperties;[key: string]: any });
 	metadata.properties = metadata.properties ? metadata.properties : data.properties ? data.properties : {};
@@ -131,13 +130,13 @@ export async function CreateVehicle(
 
 	const state = vehicle.getState();
 	for (const key in metadata) {
-		if (key === 'properties') {
-			state.set('vehicleProperties', metadata.properties, true);
+		if (key !== 'properties') {
+			state.set(key, metadata[key], true);
 		}
-		state.set(key, metadata[key], true);
 	}
-	state.set('vehicleId', vehicle.id, true);
+
 	state.set('initVehicle', true, true);
+	setVehicleProperties(entity, metadata.properties)
 
 	return vehicle;
 }
@@ -156,23 +155,24 @@ export async function SpawnVehicle(id: number, coords: number | number[], headin
 setInterval(async () => {
 	for (const key of Object.keys(OxVehicle.getAll())) {
 		const vehicle = OxVehicle.get(key);
-		if (vehicle && vehicle.id && vehicle.entity && DoesEntityExist(vehicle.entity) && Entity(vehicle.entity).state.vehicleProperties === false) {
+		if (vehicle && vehicle.id && vehicle.entity && DoesEntityExist(vehicle.entity) && GetVehicleNumberPlateText(vehicle.entity) !== "WAITINGG") {
 			const ownerId = NetworkGetEntityOwner(NetworkGetEntityFromNetworkId(vehicle.netId));
-			if (ownerId && ownerId !== -1) {
+			if (ownerId > 0) {
 				try {
 					const properties: any = await triggerClientCallback('ceeb_vehicle:getProperties', ownerId, vehicle.netId);
 					if (properties) {
 						const currentProperties = vehicle.get('properties');
 						if (properties.plate !== currentProperties.plate) {
-							console.log(`[ceeb_debug] Vehicle id [${vehicle.id}] has changed plate from [${currentProperties.plate}] to [${properties.plate}]`)
+							console.log(`[ceeb_debug][saving] Vehicle id [${vehicle.id}] has changed plate from [${currentProperties.plate}] to [${properties.plate}]`)
+						} else {
+							vehicle.set('properties', properties);
 						}
-						vehicle.set('properties', properties);
 					}
 				} catch (error) {
 					// console.error('Error in triggerClientCallback:', error);
 				}
 			}
-			if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity) && Entity(vehicle.entity).state.vehicleProperties === false) {
+			if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity) && GetVehicleNumberPlateText(vehicle.entity) !== "WAITINGG") {
 				const coords = GetEntityCoords(vehicle.entity);
 				const heading = GetEntityHeading(vehicle.entity);
 				vehicle.set('coords', [coords[0], coords[1], coords[2], heading]);

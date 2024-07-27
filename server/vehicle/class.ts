@@ -147,7 +147,7 @@ export class OxVehicle extends ClassInterface {
 		this.#stored = stored;
 
 		OxVehicle.add(this.entity, this);
-		SetVehicleNumberPlateText(this.entity, "WAITING ");
+		SetVehicleNumberPlateText(this.entity, "WAITINGG");
 		emit('ox:spawnedVehicle', this.entity, this.id);
 	}
 
@@ -167,7 +167,7 @@ export class OxVehicle extends ClassInterface {
 
 	#getSaveData() {
 		if (!this.id) return;
-		if (this.entity && DoesEntityExist(this.entity) && Entity(this.entity).state.vehicleProperties === false) {
+		if (this.entity && DoesEntityExist(this.entity) && GetVehicleNumberPlateText(this.entity) !== "WAITINGG") {
 			const coords = GetEntityCoords(this.entity);
 			const heading = GetEntityHeading(this.entity);
 			this.set('coords', [coords[0], coords[1], coords[2], heading]);

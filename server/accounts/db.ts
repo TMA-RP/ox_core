@@ -1,8 +1,9 @@
 import { Connection, GetConnection, db } from 'db';
 import { OxPlayer } from 'player/class';
-import type { OxAccount } from 'types';
+import type { OxAccount, OxAccountRoles } from 'types';
 import locales from '../../common/locales';
 import { getRandomInt } from '@overextended/ox_lib';
+import { CanPerformAction } from './roles';
 
 const addBalance = `UPDATE accounts SET balance = balance + ? WHERE id = ?`;
 const removeBalance = `UPDATE accounts SET balance = balance - ? WHERE id = ?`;
@@ -34,16 +35,18 @@ export async function UpdateBalance(
   note?: string
 ) {
   using conn = await GetConnection();
-
   const balance = await conn.scalar<number>(getBalance, [id]);
 
   if (balance === null) return 'no_balance';
 
   const addAction = action === 'add';
+  const success = addAction
+    ? await conn.update(addBalance, [amount, id])
+    : await conn.update(overdraw ? removeBalance : safeRemoveBalance, [amount, id, amount]);
 
   return (
-    (await conn.update(addAction ? addBalance : overdraw ? removeBalance : safeRemoveBalance, [amount, id, amount])) &&
-    (await conn.execute(addTransaction, [
+    success &&
+    (await conn.update(addTransaction, [
       null,
       addAction ? null : id,
       addAction ? id : null,
@@ -52,7 +55,7 @@ export async function UpdateBalance(
       note,
       addAction ? null : balance + amount,
       addAction ? balance + amount : null,
-    ]))
+    ])) === 1
   );
 }
 
@@ -75,10 +78,10 @@ export async function PerformTransaction(
   await conn.beginTransaction();
 
   try {
-    const a = await conn.update(overdraw ? removeBalance : safeRemoveBalance, [amount, fromId, amount]);
-    const b = await conn.update(addBalance, [amount, toId]);
+    const removedBalance = await conn.update(overdraw ? removeBalance : safeRemoveBalance, [amount, fromId, amount]);
+    const addedBalance = removedBalance && (await conn.update(addBalance, [amount, toId]));
 
-    if (a && b) {
+    if (addedBalance) {
       await conn.execute(addTransaction, [
         actorId,
         fromId,
@@ -147,7 +150,7 @@ export async function CreateNewAccount(
 }
 
 export function DeleteAccount(accountId: number) {
-  return db.update(`DELETE FROM accounts WHERE id = ?`, [accountId]);
+  return db.update(`UPDATE accounts SET \`type\` = 'inactive' WHERE id = ?`, [accountId]);
 }
 
 const selectAccountRole = `SELECT role FROM accounts_access WHERE accountId = ? AND charId = ?`;
@@ -163,9 +166,9 @@ export async function DepositMoney(
   message?: string,
   note?: string
 ) {
-  const { charId } = OxPlayer.get(playerId);
+  const player = OxPlayer.get(playerId);
 
-  if (!charId) return 'no_charId';
+  if (!player?.charId) return 'no_charId';
 
   const money = exports.ox_inventory.GetItemCount(playerId, 'money');
 
@@ -176,9 +179,9 @@ export async function DepositMoney(
 
   if (balance === null) return 'no_balance';
 
-  const role = await conn.scalar<string>(selectAccountRole, [accountId, charId]);
+  const role = await conn.scalar<OxAccountRoles>(selectAccountRole, [accountId, player.charId]);
 
-  if (role !== 'owner') return 'no_access';
+  if (!(await CanPerformAction(player, accountId, role, 'deposit'))) return 'no_access';
 
   await conn.beginTransaction();
 
@@ -190,7 +193,7 @@ export async function DepositMoney(
   }
 
   await conn.execute(addTransaction, [
-    charId,
+    player.charId,
     null,
     accountId,
     amount,
@@ -210,15 +213,14 @@ export async function WithdrawMoney(
   message?: string,
   note?: string
 ) {
-  const { charId } = OxPlayer.get(playerId);
+  const player = OxPlayer.get(playerId);
 
-  if (!charId) return 'no_charId';
+  if (!player?.charId) return 'no_charId';
 
   using conn = await GetConnection();
+  const role = await conn.scalar<OxAccountRoles>(selectAccountRole, [accountId, player.charId]);
 
-  const role = await conn.scalar<string>(selectAccountRole, [accountId, charId]);
-
-  if (role !== 'owner' && role !== 'manager') return 'no_access';
+  if (!(await CanPerformAction(player, accountId, role, 'withdraw'))) return 'no_access';
 
   const balance = await conn.scalar<number>(getBalance, [accountId]);
 
@@ -234,7 +236,7 @@ export async function WithdrawMoney(
   }
 
   await conn.execute(addTransaction, [
-    charId,
+    player.charId,
     accountId,
     null,
     amount,
