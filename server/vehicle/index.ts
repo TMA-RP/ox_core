@@ -163,7 +163,10 @@ setInterval(async () => {
 					if (properties) {
 						const currentProperties = vehicle.get('properties');
 						if (properties.plate !== currentProperties.plate) {
-							console.log(`[ceeb_debug][saving] Vehicle id [${vehicle.id}] has changed plate from [${currentProperties.plate}] to [${properties.plate}]`)
+							// console.log(`[ceeb_debug][saving] Vehicle id [${vehicle.id}] has changed plate from [${currentProperties.plate}] to [${properties.plate}]`)
+							if (!Entity(vehicle.entity).state.vehicleProperties) {
+								setVehicleProperties(vehicle.entity, currentProperties);
+							}
 						} else {
 							vehicle.set('properties', properties);
 						}
