@@ -135,6 +135,7 @@ export async function CreateVehicle(
 		}
 	}
 
+	state.set('vehicleId', vehicle.id, true);
 	state.set('initVehicle', true, true);
 	setVehicleProperties(entity, metadata.properties)
 
