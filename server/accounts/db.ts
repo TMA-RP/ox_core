@@ -11,6 +11,12 @@ const safeRemoveBalance = `${removeBalance} AND (balance - ?) >= 0`;
 const addTransaction = `INSERT INTO accounts_transactions (actorId, fromId, toId, amount, message, note, fromBalance, toBalance) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 const getBalance = `SELECT balance FROM accounts WHERE id = ?`;
 const doesAccountExist = `SELECT 1 FROM accounts WHERE id = ?`;
+const getCharacterAccounts = `SELECT access.role, account.*, CONCAT(c.firstName, " ", c.lastName) as ownerName
+  FROM \`accounts_access\` access
+  LEFT JOIN accounts account ON account.id = access.accountId
+  LEFT JOIN characters c ON account.owner = c.charId
+  WHERE access.charId = ? AND account.type != 'inactive'`;
+const getOwnedCharacterAccounts = `${getCharacterAccounts} AND access.role = 'owner'`;
 
 async function GenerateAccountId(conn: Connection) {
   const date = new Date();
@@ -125,11 +131,8 @@ export async function SelectAccount(id: number) {
   return db.single(await SelectAccounts('id', id));
 }
 
-export async function SelectAllAccounts(id: number) {
-  return await db.execute<OxAccount>(
-    'SELECT ac.role, a.* FROM `accounts_access` ac LEFT JOIN accounts a ON a.id = ac.accountId WHERE ac.charId = ?',
-    [id]
-  );
+export async function SelectAllAccounts(id: number, includeAll?: boolean) {
+  return await db.execute<OxAccount>(includeAll ? getCharacterAccounts : getOwnedCharacterAccounts, [id]);
 }
 
 export async function IsAccountIdAvailable(id: number) {
