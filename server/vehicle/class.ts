@@ -148,6 +148,7 @@ export class OxVehicle extends ClassInterface {
 
 		OxVehicle.add(this.entity, this);
 		SetVehicleNumberPlateText(this.entity, "WAITINGG");
+		SetEntityRoutingBucket(this.entity, this.#metadata.instance || 0);
 		emit('ox:spawnedVehicle', this.entity, this.id);
 	}
 
