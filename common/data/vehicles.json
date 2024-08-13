@@ -127,6 +127,22 @@
     "type": "automobile",
     "price": 45900
   },
+  "2vd_vscout": {
+    "isUsedInServer": true,
+    "isPlayerAllowed": false,
+    "acceleration": 0.2,
+    "braking": 0.6,
+    "handling": 0.58,
+    "speed": 38.4289,
+    "traction": 1.9,
+    "name": "Gresley",
+    "make": "Gresley",
+    "class": "C",
+    "seats": 4,
+    "doors": 6,
+    "type": "automobile",
+    "price": 47500
+  },
   "2vd_vstanier": {
     "isUsedInServer": true,
     "isPlayerAllowed": false,
@@ -632,7 +648,7 @@
     "price": 740890
   },
   "b412": {
-    "isUsedInServer": false,
+    "isUsedInServer": true,
     "isPlayerAllowed": false,
     "acceleration": 5.635,
     "braking": 3.4919,
@@ -645,7 +661,7 @@
     "seats": 4,
     "doors": 4,
     "type": "heli",
-    "price": 0
+    "price": 250000
   },
   "bagger": {
     "isUsedInServer": true,
