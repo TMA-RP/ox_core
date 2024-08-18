@@ -161,10 +161,10 @@ async function OnPlayerDeath() {
 		if (!OxPlayer.state.isDead) ClearDeath(tickId, false);
 	});
 
-	const coords = GetEntityCoords(cache.ped, true);
 	const health = 200 - 65;
 
 	while (IsPedRagdoll(cache.ped)) await sleep(0);
+	const coords = GetEntityCoords(cache.ped, true);
 
 	NetworkResurrectLocalPlayer(coords[0], coords[1], coords[2], GetEntityHeading(cache.ped), 0, false);
 
