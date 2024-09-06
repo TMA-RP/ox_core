@@ -1,21 +1,18 @@
 import type { Dict } from 'types';
 
 export function GetPlayerLicense(playerId: number | string) {
-  return (
-    GetPlayerIdentifierByType(playerId as string, 'license2') ||
-    GetPlayerIdentifierByType(playerId as string, 'license')
-  );
+	return GetPlayerIdentifierByType(playerId as string, 'discord');
 }
 
 export function GetIdentifiers(playerId: number | string) {
-  const identifiers: Dict<string> = {};
-  playerId = playerId.toString();
+	const identifiers: Dict<string> = {};
+	playerId = playerId.toString();
 
-  for (let index = 0; index < GetNumPlayerIdentifiers(playerId); index++) {
-    const [prefix, identifier] = GetPlayerIdentifier(playerId, index).split(':');
+	for (let index = 0; index < GetNumPlayerIdentifiers(playerId); index++) {
+		const [prefix, identifier] = GetPlayerIdentifier(playerId, index).split(':');
 
-    if (prefix !== 'ip') identifiers[prefix] = identifier;
-  }
+		if (prefix !== 'ip') identifiers[prefix] = identifier;
+	}
 
-  return identifiers;
+	return identifiers;
 }

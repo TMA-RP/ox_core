@@ -1,21 +1,23 @@
-import { cache, requestAnimDict, sleep } from '@overextended/ox_lib/client';
-import { Vector3, Vector4 } from '@nativewrappers/fivem';
+import { cache, requestAnimDict, sleep, notify, triggerServerCallback } from '@overextended/ox_lib/client';
+import { Vector4 } from '@nativewrappers/fivem';
 import { OxPlayer } from 'player';
-import { DEATH_SYSTEM, DEBUG } from 'config';
+import { formatDistanceStrict } from "date-fns";
+import { fr } from "date-fns/locale";
 
-const hospitals = [
-  new Vector4(340.5, -1396.8, 32.5, 60.1),
-  new Vector4(-449.3, -340.2, 34.5, 76.2),
-  new Vector4(295.6, -583.9, 43.2, 79.5),
-  new Vector4(1840.1, 3670.7, 33.9, 207.6),
-  new Vector4(1153.2, -1526.4, 34.8, 352.4),
-  new Vector4(-244.7, 6328.3, 32.4, 242.1),
-];
+function helpNotify(message: string) {
+	AddTextEntry("HelpMsg", message)
+	BeginTextCommandDisplayHelp("HelpMsg")
+	EndTextCommandDisplayHelp(0, false, false, -1)
+}
 
 const anims = [
-  ['missfinale_c1@', 'lying_dead_player0'],
-  ['veh@low@front_ps@idle_duck', 'sit'],
-  ['dead', 'dead_a'],
+	['missfinale_c1@', 'lying_dead_player0'],
+	['veh@low@front_ps@idle_duck', 'sit'],
+];
+
+const allowedAnimationsWhileDead = [
+	['nm', 'firemans_carry'],
+	['amb@code_human_in_car_idles@generic@ps@base', 'base'],
 ];
 
 let playerIsDead = false;
@@ -27,110 +29,170 @@ let playerIsDead = false;
  */
 
 async function ClearDeath(tickId: number, bleedOut: boolean) {
-  const anim = cache.vehicle ? anims[1] : anims[0];
+	OxPlayer.state.set("isDead", false, true);
+	exports['pma-voice'].resetProximityCheck();
+	exports["lb-phone"].ToggleDisabled(false);
+	exports["scully_emotemenu"].setLimitation(false);
+	const anim = cache.vehicle ? anims[1] : anims[0];
+	OxPlayer.state.set("deathTimestamp", false, true)
+	OxPlayer.state.set("invBusy", false, false);
+	playerIsDead = false;
+	clearTick(tickId);
 
-  clearTick(tickId);
+	if (bleedOut) {
+		const hospital = Vector4.fromArray([323.5289, -584.9305, 43.2841, 64.2267]);
 
-  if (bleedOut) {
-    const coords = Vector3.fromArray(GetEntityCoords(cache.ped, true));
-    let distance = 1000;
-    const hospital = hospitals.reduce((closest, hospital) => {
-      const hospitalDistance = coords.distance(hospital);
+		DoScreenFadeOut(800);
+		RequestCollisionAtCoord(hospital.x, hospital.y, hospital.z);
 
-      if (hospitalDistance > distance) return closest;
+		while (!IsScreenFadedOut()) await sleep(10);
+		await sleep(1000);
 
-      distance = hospitalDistance;
-      return hospital;
-    });
+		AnimpostfxStop('DeathFailOut');
+		StopAnimTask(cache.ped, anim[0], anim[1], 8.0);
+		SetEntityCoordsNoOffset(cache.ped, hospital.x, hospital.y, hospital.z, false, false, false);
+		SetEntityHeading(cache.ped, hospital.w);
+		SetGameplayCamRelativeHeading(0);
+		emit("ceeb_job:setUnityXNerf");
 
-    DoScreenFadeOut(500);
-    RequestCollisionAtCoord(hospital.x, hospital.y, hospital.z);
 
-    while (!IsScreenFadedOut()) await sleep(0);
+		DoScreenFadeIn(800);
 
-    StopAnimTask(cache.ped, anim[0], anim[1], 8.0);
-    SetEntityCoordsNoOffset(cache.ped, hospital.x, hospital.y, hospital.z, false, false, false);
-    SetEntityHeading(cache.ped, hospital.w);
-    SetGameplayCamRelativeHeading(0);
+		while (!IsScreenFadedIn()) await sleep(10);
+	} else {
+		AnimpostfxStop('DeathFailOut');
+		StopAnimTask(cache.ped, anim[0], anim[1], 8.0);
+	}
+	ClearPedBloodDamage(cache.ped);
+	SetPlayerControl(cache.playerId, false, 0);
+	SetEveryoneIgnorePlayer(cache.playerId, false);
+	SetPlayerControl(cache.playerId, true, 0);
+	SetPlayerInvincible(cache.playerId, false);
 
-    await sleep(500);
+	for (let index = 0; index < anims.length; index++) RemoveAnimDict(anims[index][0]);
 
-    DoScreenFadeIn(500);
-
-    while (!IsScreenFadedIn()) await sleep(0);
-  } else {
-    StopAnimTask(cache.ped, anim[0], anim[1], 8.0);
-  }
-
-  ClearPedBloodDamage(cache.ped);
-  SetPlayerControl(cache.playerId, false, 0);
-  SetEveryoneIgnorePlayer(cache.playerId, false);
-  SetPlayerControl(cache.playerId, true, 0);
-  SetPlayerInvincible(cache.playerId, false);
-
-  for (let index = 0; index < anims.length; index++) RemoveAnimDict(anims[index][0]);
-
-  OxPlayer.state.set('isDead', false, true);
-  emit('ox:playerRevived');
+	emit('ox:playerRevived');
 }
 
-const bleedOutTime = DEBUG ? 100 : 1000;
+function IsPlayingAllowedAnim() {
+	for (let index = 0; index < allowedAnimationsWhileDead.length; index++) {
+		const anim = allowedAnimationsWhileDead[index];
+		if (IsEntityPlayingAnim(cache.ped, anim[0], anim[1], 3)) return true;
+	}
+	return false;
+}
+
+let waitingForDeath = false;
 
 async function OnPlayerDeath() {
-  OxPlayer.state.set('isDead', true, true);
-  emit('ox_inventory:disarm');
-  emit('ox:playerDeath');
+	if (waitingForDeath) return;
+	waitingForDeath = true;
+	if (!OxPlayer.state.isDead) {
+		emitNet("ceeb_job:newDeath");
+	}
+	const newTimestamp = Date.now() + 15 * 60 * 1000; // 15 minutes
+	const waitUntil = Date.now() + 1000;
+	while (!OxPlayer.state.deathTimestamp && Date.now() < waitUntil) {
+		await sleep(100);
+	}
+	const oldTimestamp = OxPlayer.state.deathTimestamp;
+	const timestamp = oldTimestamp ? oldTimestamp : newTimestamp;
+	if (!oldTimestamp) OxPlayer.state.set("deathTimestamp", newTimestamp, true);
 
-  if (!DEATH_SYSTEM) return;
+	OxPlayer.state.set("isDead", true, true);
+	playerIsDead = true;
+	waitingForDeath = false;
 
-  for (let index = 0; index < anims.length; index++) await requestAnimDict(anims[index][0]);
+	exports['pma-voice'].overrideProximityCheck(() => {
+		return false
+	});
+	exports["lb-phone"].ToggleOpen(false, true);
+	exports["lb-phone"].ToggleDisabled(true);
+	exports["scully_emotemenu"].setLimitation(true);
+	OxPlayer.state.set("invBusy", true, false);
 
-  ShakeGameplayCam('DEATH_FAIL_IN_EFFECT_SHAKE', 1.0);
+	emit('ox_inventory:disarm');
+	emit('ox:playerDeath');
+	AnimpostfxPlay('DeathFailOut', 0, true);
+	let hasSentDistress = false;
 
-  let bleedOut = 0;
-  const tickId = setTick(() => {
-    const anim = cache.vehicle ? anims[1] : anims[0];
+	const tickId = setTick(async () => {
+		const anim = cache.vehicle ? anims[1] : anims[0];
+		const currentDate = Date.now();
 
-    if (!IsEntityPlayingAnim(cache.ped, anim[0], anim[1], 3))
-      TaskPlayAnim(cache.ped, anim[0], anim[1], 50.0, 8.0, -1, 1, 1.0, false, false, false);
+		if (!IsEntityPlayingAnim(cache.ped, anim[0], anim[1], 3) && !IsPlayingAllowedAnim()) {
+			await requestAnimDict(anim[0]);
+			TaskPlayAnim(cache.ped, anim[0], anim[1], 50.0, 8.0, -1, 1, 1.0, false, false, false);
+			RemoveAnimDict(anim[0])
+		}
 
-    DisableFirstPersonCamThisFrame();
+		DisableFirstPersonCamThisFrame();
 
-    bleedOut++;
+		const time = Math.floor((timestamp - currentDate) / 1000);
+		if (time > 0) {
+			const formattedTime = formatDistanceStrict(timestamp, currentDate, { locale: fr });
+			if (hasSentDistress) {
+				helpNotify(`${formattedTime} avant de pouvoir appeler l'unité X`);
+			} else {
+				helpNotify(`${formattedTime} avant de pouvoir appeler l'unité X\n\n~INPUT_PICKUP~ pour envoyer un signal de détresse`);
+				if (IsControlJustReleased(0, 38)) {
+					hasSentDistress = true;
+					TriggerServerEvent("ceeb_job:sendDistress");
+				}
+			}
+		} else {
+			helpNotify("~INPUT_PICKUP~ pour être réanimé par l'unité X");
+			if (IsControlJustReleased(0, 38)) {
+				const canBeRevived = await triggerServerCallback("ceeb_job:canRevive", 0, cache.serverId);
+				if (canBeRevived) {
+					const ambulancePlayers = await triggerServerCallback<number>("ceeb_duty:getWorkingByJob", 0, "ambulance");
+					if (ambulancePlayers! < 2) {
+						ClearDeath(tickId, true);
+					} else {
+						notify({ type: "error", description: "L'unité X est indisponible pour le moment" });
+					}
+				} else {
+					notify({ type: "error", description: "Vous ne pouvez pas être réanimé" });
+				}
+			}
+		}
 
-    if (bleedOut > bleedOutTime) ClearDeath(tickId, true);
-  });
 
-  const coords = GetEntityCoords(cache.ped, true);
-  const health = Math.floor(Math.max(100, GetEntityMaxHealth(cache.ped) * 0.8));
+		if (!OxPlayer.state.isDead) ClearDeath(tickId, false);
+	});
 
-  NetworkResurrectLocalPlayer(coords[0], coords[1], coords[2], GetEntityHeading(cache.ped), 0, false);
+	const health = 200 - 65;
 
-  if (cache.vehicle) SetPedIntoVehicle(cache.ped, cache.vehicle, cache.seat as number);
+	while (IsPedRagdoll(cache.ped)) await sleep(0);
+	const coords = GetEntityCoords(cache.ped, true);
 
-  SetEntityInvincible(cache.ped, true);
-  SetEntityHealth(cache.ped, health);
-  SetEveryoneIgnorePlayer(cache.playerId, true);
+	NetworkResurrectLocalPlayer(coords[0], coords[1], coords[2], GetEntityHeading(cache.ped), 0, false);
+
+	if (cache.vehicle) SetPedIntoVehicle(cache.ped, cache.vehicle, cache.seat as number);
+
+	SetEntityInvincible(cache.ped, true);
+	SetEntityHealth(cache.ped, health);
+	SetEveryoneIgnorePlayer(cache.playerId, true);
 }
 
 AddStateBagChangeHandler(
-  'isDead',
-  `player:${cache.serverId}`,
-  async (bagName: string, key: string, value: any, reserved: number, replicated: boolean) => {
-    if (!replicated) return;
+	'isDead',
+	`player:${cache.serverId}`,
+	async (bagName: string, key: string, value: any, reserved: number, replicated: boolean) => {
+		if (!replicated) return;
 
-    playerIsDead = value;
-  }
+		playerIsDead = value;
+	}
 );
 
 on('ox:playerLogout', () => {
-  playerIsDead = false;
+	playerIsDead = false;
 });
 
 on('ox:playerLoaded', () => {
-  const id: CitizenTimer = setInterval(() => {
-    if (!OxPlayer.isLoaded) return clearInterval(id);
+	const id: CitizenTimer = setInterval(() => {
+		if (!OxPlayer.isLoaded) return clearInterval(id);
 
-    if (!playerIsDead && IsPedDeadOrDying(PlayerPedId(), true)) OnPlayerDeath();
-  }, 200);
+		if (!playerIsDead && IsPedDeadOrDying(PlayerPedId(), true)) OnPlayerDeath();
+	}, 200);
 });

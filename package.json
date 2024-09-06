@@ -41,6 +41,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+	"date-fns": "^3.6.0",
     "@nativewrappers/fivem": "^0.0.41",
     "@overextended/ox_lib": "^3.25.0",
     "mariadb": "^3.3.1"

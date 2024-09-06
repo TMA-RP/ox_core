@@ -7,8 +7,8 @@
   "female": "Female",
   "non_binary": "Non-Binary",
   "date_of_birth": "Date of birth",
-  "withdraw": "Withdraw",
-  "deposit": "Deposit",
-  "transfer": "Bank transfer",
-  "invoice_payment": "Invoice payment"
+  "withdraw": "Retrait",
+  "deposit": "Dépôt",
+  "transfer": "Virement bancaire",
+  "invoice_payment": "Paiement de facture"
 }

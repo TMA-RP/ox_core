@@ -6,6 +6,13 @@
     "speed": 109.7643,
     "traction": 2.15
   },
+  "bicycle": {
+    "acceleration": 0.17,
+    "braking": 3.1,
+    "handling": 0.55,
+    "speed": 21,
+    "traction": 2.05
+  },
   "land": {
     "acceleration": 0.82,
     "braking": 3.1,
