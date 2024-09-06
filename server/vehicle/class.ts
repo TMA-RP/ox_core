@@ -250,7 +250,7 @@ export class OxVehicle extends ClassInterface {
 		rotation = Vector3.fromObject(rotation || hasEntity ? GetEntityRotation(this.entity) : null);
 
 		OxVehicle.remove(this.entity);
-
+		const oldEntity = this.entity;
 		if (hasEntity) DeleteVehicle(this.entity);
 
 		this.entity = OxVehicle.spawn(this.model, coords, 0);
@@ -269,6 +269,7 @@ export class OxVehicle extends ClassInterface {
 		state.set('vehicleId', this.id, true);
 		SetEntityRoutingBucket(this.entity, this.#metadata.instance || 0);
 		setVehicleProperties(this.entity, this.#metadata.properties);
+		emit('ox:respawnedVehicle', oldEntity, this.entity);
 		emit('ox:spawnedVehicle', this.entity, this.id);
 	}
 }
