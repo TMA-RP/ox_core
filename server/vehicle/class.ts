@@ -148,7 +148,7 @@ export class OxVehicle extends ClassInterface {
 		this.#metadata = metadata || {};
 		this.#stored = stored;
 
-		if (this.id) this.setStored(null, false);
+		if (this.id && !this.#stored?.startsWith("property_")) this.setStored(null, false);
 
 		OxVehicle.add(this.entity, this);
 		const state = this.getState();

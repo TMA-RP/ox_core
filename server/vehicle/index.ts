@@ -101,7 +101,6 @@ export async function CreateVehicle(
 	);
 
 	const state = vehicle.getState();
-	if (vehicle.id && !data.stored?.startsWith("property_")) vehicle.setStored(null, false);
 	state.set('initVehicle', true, true)
 
 	return vehicle;
