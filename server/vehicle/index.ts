@@ -5,11 +5,13 @@ import { DEBUG } from '../../common/config';
 import './class';
 import './commands';
 import './events';
-import { VehicleProperties, setVehicleProperties, triggerClientCallback } from '@overextended/ox_lib/server';
+import { VehicleProperties, triggerClientCallback, setVehicleProperties } from '@overextended/ox_lib/server';
 import { sleep } from '@overextended/ox_lib';
-import { VectorFromBuffer } from '../../common';
+import { Vector3 } from '@nativewrappers/fivem';
 
 if (DEBUG) import('./parser');
+
+type Vec3 = number[] | { x: number; y: number; z: number } | { buffer: any };
 
 export async function CreateVehicle(
 	data:
@@ -21,7 +23,7 @@ export async function CreateVehicle(
 			stored?: string;
 			properties?: Partial<VehicleProperties>;
 		}),
-	coords?: number | number[] | { x: number; y: number; z: number } | { buffer: any },
+	coords?: Vec3,
 	heading?: number,
 	invokingScript = GetInvokingResource()
 ) {
@@ -42,43 +44,15 @@ export async function CreateVehicle(
 				return vehicle;
 			}
 
-			// console.log("[ceeb_debug][ox_core] Despawning vehicle with plate in order to respawn it " + vehicle.plate)
 			vehicle.despawn(true);
 		}
 	}
 
-	let networkType: string = vehicleData.type as any;
+	if (coords) coords = Vector3.fromObject(coords);
 
-	/**
-	 * Remap vehicle types to their net types.
-	 * https://github.com/citizenfx/fivem/commit/1e266a2ca5c04eb96c090de67508a3475d35d6da
-	 */
+	const entity = coords ? OxVehicle.spawn(data.model, coords as Vector3, heading || 0) : 0;
 
-	switch (networkType) {
-		case 'bicycle':
-			networkType = 'bike';
-			break;
-		case 'blimp':
-			networkType = 'heli';
-			break;
-		case 'quadbike':
-		case 'amphibious_quadbike':
-		case 'amphibious_automobile':
-		case 'submarinecar':
-			networkType = 'automobile';
-			break;
-	}
-
-	if (typeof coords === 'number') coords = GetEntityCoords(coords);
-	else if (typeof coords === 'object' && !Array.isArray(coords)) {
-		coords = 'buffer' in coords ? VectorFromBuffer(coords) : [coords.x || 0, coords.y || 0, coords.z || 0];
-	}
-
-	const entity = coords
-		? CreateVehicleServerSetter(data.model, networkType, coords[0], coords[1], coords[2], heading || 90)
-		: 0;
-
-	if (!coords || !DoesEntityExist(entity)) return;
+	if (!entity || !DoesEntityExist(entity)) return;
 	if (!data.vin && (data.owner || data.group)) data.vin = await OxVehicle.generateVin(vehicleData);
 	if (data.vin && !data.owner && !data.group) delete data.vin;
 
@@ -93,7 +67,7 @@ export async function CreateVehicle(
 
 	if (plateChanged && data.id) console.log(`[ceeb_debug][vehicle_creation] Vehicle id [${data.id}] has changed plate from [${oldPlate}] to [${data.plate}]`);
 
-	const metadata = data.data || ({} as { properties: VehicleProperties;[key: string]: any });
+	const metadata = data.data || ({} as { properties: Partial<VehicleProperties>;[key: string]: any });
 	metadata.properties = metadata.properties ? metadata.properties : data.properties ? data.properties : {};
 	metadata.properties.plate = plateChanged ? data.plate : metadata.properties.plate ? metadata.properties.plate : data.plate;
 	if (!metadata.label) metadata.label = `${vehicleData.name} - ${data.plate}`;
@@ -126,71 +100,22 @@ export async function CreateVehicle(
 		data.group
 	);
 
-	if (vehicle.id && !data.stored?.startsWith("property_")) vehicle.setStored(null, false);
-
 	const state = vehicle.getState();
-	for (const key in metadata) {
-		if (key !== 'properties') {
-			state.set(key, metadata[key], true);
-		}
-	}
-
-	state.set('vehicleId', vehicle.id, true);
-	state.set('initVehicle', true, true);
-	setVehicleProperties(entity, metadata.properties)
+	if (vehicle.id && !data.stored?.startsWith("property_")) vehicle.setStored(null, false);
+	state.set('initVehicle', true, true)
 
 	return vehicle;
 }
 
-export async function SpawnVehicle(id: number, coords: number | number[], heading?: number) {
+export async function SpawnVehicle(id: number, coords: Vec3, heading?: number) {
 	const invokingScript = GetInvokingResource();
 	const vehicle = await GetVehicleFromId(id);
-
 	if (!vehicle) return;
 
 	vehicle.data = JSON.parse(vehicle.data as any);
 
 	return await CreateVehicle(vehicle, coords, heading, invokingScript);
 }
-
-setInterval(async () => {
-	for (const key of Object.keys(OxVehicle.getAll())) {
-		const vehicle = OxVehicle.get(key);
-		if (vehicle && vehicle.id && vehicle.entity && DoesEntityExist(vehicle.entity)) {
-			const ownerId = NetworkGetEntityOwner(NetworkGetEntityFromNetworkId(vehicle.netId));
-			if (ownerId > 0) {
-				try {
-					const properties: any = await triggerClientCallback('ceeb_vehicle:getProperties', ownerId, vehicle.netId);
-					if (properties) {
-						const currentProperties = vehicle.get('properties');
-						if (properties.plate !== currentProperties.plate) {
-							// console.log(`[ceeb_debug][saving] Vehicle id [${vehicle.id}] has changed plate from [${currentProperties.plate}] to [${properties.plate}]`)
-							if (!Entity(vehicle.entity).state["ox_lib:setVehicleProperties"]) {
-								setVehicleProperties(vehicle.entity, currentProperties);
-							}
-						} else {
-							vehicle.set('properties', properties);
-						}
-					}
-				} catch (error) {
-					// console.error('Error in triggerClientCallback:', error);
-				}
-			}
-			if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity) && GetVehicleNumberPlateText(vehicle.entity) !== "WAITINGG") {
-				const coords = GetEntityCoords(vehicle.entity);
-				const heading = GetEntityHeading(vehicle.entity);
-				vehicle.set('coords', [coords[0], coords[1], coords[2], heading]);
-			}
-		}
-	}
-}, 5000);
-
-/**
- * Sets an interval to save every 10 minutes.
- * @todo Consider performance on servers with a high vehicle-count.
- * Multiple staggered saves may improve load.
- */
-setInterval(() => OxVehicle.saveAll(undefined, false), 600000);
 
 on('txAdmin:events:serverShuttingDown', () => {
 	OxVehicle.saveAll(undefined, true);
@@ -239,6 +164,38 @@ AddStateBagChangeHandler('', '', async (bagName: string, key: string, value: any
 	}
 	vehicle.set(key, value)
 })
+
+setInterval(async () => {
+	for (const key of Object.keys(OxVehicle.getAll())) {
+		const vehicle = OxVehicle.get(key);
+		if (vehicle && vehicle.id && vehicle.entity && DoesEntityExist(vehicle.entity) && !Entity(vehicle.entity).state["ox_lib:setVehicleProperties"]) {
+			const ownerId = NetworkGetEntityOwner(NetworkGetEntityFromNetworkId(vehicle.netId));
+			if (ownerId > 0) {
+				try {
+					const properties: any = await triggerClientCallback('ceeb_vehicle:getProperties', ownerId, vehicle.netId);
+					if (properties) {
+						const currentProperties = vehicle.get('properties');
+						if (properties.plate !== currentProperties.plate) {
+							console.log(`[ceeb_debug][saving] Vehicle id [${vehicle.id}] has changed plate from [${currentProperties.plate}] to [${properties.plate}]`)
+							if (!Entity(vehicle.entity).state["ox_lib:setVehicleProperties"]) {
+								setVehicleProperties(vehicle.entity, currentProperties);
+							}
+						} else {
+							vehicle.set('properties', properties);
+						}
+					}
+				} catch (error) {
+					// console.error('Error in triggerClientCallback:', error);
+				}
+			}
+			if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity) && !Entity(vehicle.entity).state["ox_lib:setVehicleProperties"]) {
+				const coords = GetEntityCoords(vehicle.entity);
+				const heading = GetEntityHeading(vehicle.entity);
+				vehicle.set('coords', [coords[0], coords[1], coords[2], heading]);
+			}
+		}
+	}
+}, 5000);
 
 exports('CreateVehicle', CreateVehicle);
 exports('SpawnVehicle', SpawnVehicle);

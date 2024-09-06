@@ -1,45 +1,46 @@
-import {
-	cache,
-	onServerCallback,
-	waitFor,
-} from '@overextended/ox_lib/client';
+import { cache, onServerCallback, waitFor } from '@overextended/ox_lib/client';
 import { Vector3 } from '@nativewrappers/fivem';
 import { DEBUG } from '../config';
 
 if (DEBUG) import('./parser');
 
 onServerCallback('ox:getNearbyVehicles', (radius: number) => {
-	const nearbyEntities: number[] = [];
-	const playerCoords = Vector3.fromArray(GetEntityCoords(cache.ped, true));
+  const nearbyEntities: number[] = [];
+  const playerCoords = Vector3.fromArray(GetEntityCoords(cache.ped, true));
 
-	(GetGamePool('CVehicle') as number[]).forEach((entityId) => {
-		const coords = Vector3.fromArray(GetEntityCoords(entityId, true));
-		const distance = coords.distance(playerCoords);
+  (GetGamePool('CVehicle') as number[]).forEach((entityId) => {
+    const coords = Vector3.fromArray(GetEntityCoords(entityId, true));
+    const distance = coords.distance(playerCoords);
 
-		if (distance <= (radius || 2) && NetworkGetEntityIsNetworked(entityId)) nearbyEntities.push(VehToNet(entityId));
-	});
+    if (distance <= (radius || 2) && NetworkGetEntityIsNetworked(entityId)) nearbyEntities.push(VehToNet(entityId));
+  });
 
-	return nearbyEntities;
+  return nearbyEntities;
 });
 
 AddStateBagChangeHandler('initVehicle', '', async (bagName: string, key: string, value: any) => {
-	if (!value) return;
+  if (!value) return;
 
-	const entity = await waitFor(async () => {
-		const entity = GetEntityFromStateBagName(bagName);
-		DEV: console.info(key, entity);
+  await waitFor(() => (!NetworkIsInTutorialSession() ? true : undefined), '', 0);
 
-		if (entity) return entity;
-	}, 'failed to get entity from statebag name');
+  const entity = await waitFor(
+    async () => {
+      const entity = GetEntityFromStateBagName(bagName);
 
-	if (!entity) return;
+      if (entity) return entity;
+    },
+    `failed to get entity from statebag name ${bagName}`,
+    10000
+  );
 
-	await waitFor(async () => {
-		if (!IsEntityWaitingForWorldCollision(entity)) return true;
-	});
+  if (!entity) return;
 
-	if (NetworkGetEntityOwner(entity) !== cache.playerId) return;
+  await waitFor(async () => {
+    if (!IsEntityWaitingForWorldCollision(entity)) return true;
+  });
 
-	SetVehicleOnGroundProperly(entity);
-	setTimeout(() => Entity(entity).state.set(key, null, true));
+  if (NetworkGetEntityOwner(entity) !== cache.playerId) return;
+
+  SetVehicleOnGroundProperly(entity);
+  setTimeout(() => Entity(entity).state.set(key, null, true));
 });

@@ -40,7 +40,6 @@ async function StartSession() {
 	SetMaxWantedLevel(0);
 	NetworkSetFriendlyFireOption(true);
 	SetPlayerHealthRechargeMultiplier(cache.playerId, 0.0);
-	emit("ceeb_hud:display", true)
 }
 
 netEvent('ox:startCharacterSelect', async (_userId: number, characters: Character[]) => {
@@ -147,6 +146,7 @@ netEvent('ox:setActiveCharacter', async (character: Character) => {
 	}
 
 	await waitFor(() => (IsScreenFadedIn() && !IsPlayerSwitchInProgress() ? true : undefined), '', 0);
+
 	SetPedMaxHealth(cache.ped, 200);
 	SetEntityHealth(cache.ped, character.health ?? 200);
 	SetPedArmour(cache.ped, character.armour ?? 0);

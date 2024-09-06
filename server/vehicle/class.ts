@@ -3,7 +3,9 @@ import { DeleteVehicle, IsPlateAvailable, IsVinAvailable, SaveVehicleData, SetVe
 import { getRandomString, getRandomAlphanumeric, getRandomChar, getRandomInt, sleep } from '@overextended/ox_lib';
 import { PLATE_PATTERN } from '../../common/config';
 import type { Dict, VehicleData } from 'types';
-import { GetVehicleData } from '../../common/vehicles';
+import { GetVehicleData, GetVehicleNetworkType } from '../../common/vehicles';
+import { setVehicleProperties } from '@overextended/ox_lib/server';
+import { Vector3 } from '@nativewrappers/fivem';
 
 function GetPedsInVehicle(vehicle: number) {
 	let peds = []
@@ -13,8 +15,6 @@ function GetPedsInVehicle(vehicle: number) {
 	}
 	return peds
 }
-
-export type VehicleInstance = InstanceType<typeof OxVehicle>
 
 export class OxVehicle extends ClassInterface {
 	entity: number;
@@ -30,12 +30,16 @@ export class OxVehicle extends ClassInterface {
 	#metadata: Dict<any>;
 	#stored: string | null;
 
-	protected static members: Dict<VehicleInstance> = {};
-	protected static keys: Dict<Dict<VehicleInstance>> = {
+	protected static members: Dict<OxVehicle> = {};
+	protected static keys: Dict<Dict<OxVehicle>> = {
 		id: {},
 		netId: {},
 		vin: {},
 	};
+
+	static spawn(model: string, coords: Vector3, heading?: number) {
+		return CreateVehicleServerSetter(model, GetVehicleNetworkType(model), coords.x, coords.y, coords.z, heading || 0);
+	}
 
 	/** Get an instance of OxVehicle with the matching entityId. */
 	static get(entityId: string | number) {
@@ -58,7 +62,7 @@ export class OxVehicle extends ClassInterface {
 	}
 
 	/** Gets all instances of OxVehicle. */
-	static getAll(): Dict<VehicleInstance> {
+	static getAll(): Dict<OxVehicle> {
 		return this.members;
 	}
 
@@ -104,13 +108,11 @@ export class OxVehicle extends ClassInterface {
 					parameters.push(vehicle.#getSaveData());
 				}
 
-				// if (despawn) console.log("[ceeb_debug][ox_core] Despawning vehicle with plate " + vehicle.plate + " because there is a saveAll with despawn option to true")
-				// if (despawn) console.log("[ceeb_debug][ox_core] Resource", resource)
 				if (despawn) vehicle.despawn();
 			}
 		}
 
-		DEV: console.info(`Saved ${parameters.length} vehicle${parameters.length > 1 ? "s" : ""} to the database.`);
+		DEV: console.info(`Saving ${parameters.length} vehicles to the database.`);
 
 		if (parameters.length > 0) {
 			SaveVehicleData(parameters, true);
@@ -146,9 +148,19 @@ export class OxVehicle extends ClassInterface {
 		this.#metadata = metadata || {};
 		this.#stored = stored;
 
+		if (this.id) this.setStored(null, false);
+
 		OxVehicle.add(this.entity, this);
-		SetVehicleNumberPlateText(this.entity, "WAITINGG");
-		SetEntityRoutingBucket(this.entity, this.#metadata.instance || 0);
+		const state = this.getState();
+		for (const key in metadata) {
+			if (key !== 'properties') {
+				state.set(key, metadata[key], true);
+			}
+		}
+		state.set('vehicleId', this.id, true);
+		SetEntityRoutingBucket(this.entity, metadata.instance || 0);
+		setVehicleProperties(entity, metadata.properties);
+
 		emit('ox:spawnedVehicle', this.entity, this.id);
 	}
 
@@ -168,7 +180,7 @@ export class OxVehicle extends ClassInterface {
 
 	#getSaveData() {
 		if (!this.id) return;
-		if (this.entity && DoesEntityExist(this.entity) && GetVehicleNumberPlateText(this.entity) !== "WAITINGG") {
+		if (this.entity && DoesEntityExist(this.entity) && !Entity(this.entity).state["ox_lib:setVehicleProperties"]) {
 			const coords = GetEntityCoords(this.entity);
 			const heading = GetEntityHeading(this.entity);
 			this.set('coords', [coords[0], coords[1], coords[2], heading]);
@@ -182,9 +194,6 @@ export class OxVehicle extends ClassInterface {
 	}
 
 	async despawn(save?: boolean) {
-		// console.log("[ceeb_debug][ox_core] has received a despawn request for vehicle with plate " + this.plate + " with save option " + (save ? "true" : "false"))
-		// console.log(`#############################################`);
-
 		const saveData = save && this.#getSaveData();
 		if (saveData) SaveVehicleData(saveData);
 		let occupants: number[] = [];
@@ -194,6 +203,7 @@ export class OxVehicle extends ClassInterface {
 		}
 		if (occupants.length > 0) await sleep(1500);
 		if (DoesEntityExist(this.entity)) DeleteEntity(this.entity);
+
 		OxVehicle.remove(this.entity);
 	}
 
@@ -232,6 +242,34 @@ export class OxVehicle extends ClassInterface {
 		this.plate = plate.padEnd(8);
 
 		SetVehicleColumn(this.id, 'plate', this.plate);
+	}
+
+	async respawn(coords?: Vector3, rotation?: Vector3) {
+		const hasEntity = DoesEntityExist(this.entity);
+		coords = Vector3.fromObject(coords || hasEntity ? GetEntityCoords(this.entity) : null);
+		rotation = Vector3.fromObject(rotation || hasEntity ? GetEntityRotation(this.entity) : null);
+
+		OxVehicle.remove(this.entity);
+
+		if (hasEntity) DeleteVehicle(this.entity);
+
+		this.entity = OxVehicle.spawn(this.model, coords, 0);
+		this.netId = NetworkGetNetworkIdFromEntity(this.entity);
+
+		if (rotation) SetEntityRotation(this.entity, rotation.x, rotation.y, rotation.z, 2, false);
+
+		OxVehicle.add(this.entity, this);
+		const state = this.getState();
+		for (const key in this.#metadata) {
+			if (key !== 'properties') {
+				state.set(key, this.#metadata[key], true);
+			}
+		}
+
+		state.set('vehicleId', this.id, true);
+		SetEntityRoutingBucket(this.entity, this.#metadata.instance || 0);
+		setVehicleProperties(this.entity, this.#metadata.properties);
+		emit('ox:spawnedVehicle', this.entity, this.id);
 	}
 }
 
