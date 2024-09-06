@@ -40,6 +40,7 @@ async function StartSession() {
 	SetMaxWantedLevel(0);
 	NetworkSetFriendlyFireOption(true);
 	SetPlayerHealthRechargeMultiplier(cache.playerId, 0.0);
+	emit("ceeb_hud:display", true)
 }
 
 netEvent('ox:startCharacterSelect', async (_userId: number, characters: Character[]) => {
