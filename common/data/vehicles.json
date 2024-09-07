@@ -2415,6 +2415,8 @@
     "price": 65900
   },
   "castigator": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.2905,
     "braking": 0.76,
     "handling": 0.6705,
@@ -2422,11 +2424,11 @@
     "traction": 2.264,
     "name": "Castigator",
     "make": "Canis",
-    "class": 2,
+    "class": "A",
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 81492
+    "price": 0
   },
   "cavalcade": {
     "isUsedInServer": true,
@@ -3042,6 +3044,8 @@
     "price": 80420
   },
   "coquette5": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.278,
     "braking": 0.6,
     "handling": 0.658,
@@ -3049,11 +3053,11 @@
     "traction": 2.325,
     "name": "Coquette D1",
     "make": "Invetero",
-    "class": 5,
+    "class": "B",
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 78153
+    "price": 0
   },
   "corsita": {
     "isUsedInServer": false,
@@ -3620,6 +3624,8 @@
     "price": 32100
   },
   "dominator10": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.3,
     "braking": 0.69,
     "handling": 0.68,
@@ -3627,11 +3633,11 @@
     "traction": 2.383,
     "name": "Dominator FX",
     "make": "Vapid",
-    "class": 4,
+    "class": "A",
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 81545
+    "price": 0
   },
   "dominator2": {
     "isUsedInServer": false,
@@ -3826,6 +3832,8 @@
     "price": 45800
   },
   "driftcypher": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.7075,
     "braking": 0.83,
     "handling": 1.0875,
@@ -3833,11 +3841,11 @@
     "traction": 1.53,
     "name": "Cypher",
     "make": "Ubermacht",
-    "class": 6,
+    "class": "S",
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 75266
+    "price": 0
   },
   "drifteuros": {
     "isUsedInServer": true,
@@ -3904,18 +3912,20 @@
     "price": 0
   },
   "driftnebula": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.725,
     "braking": 0.74,
     "handling": 1.105,
     "speed": 45.2667,
     "traction": 1.53,
-    "name": "Nebula Turbo",
+    "name": "Nebula turbo",
     "make": "Vulcar",
-    "class": 5,
+    "class": "S",
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 76538
+    "price": 0
   },
   "driftremus": {
     "isUsedInServer": true,
@@ -3934,18 +3944,20 @@
     "price": 24800
   },
   "driftsentinel": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.716,
     "braking": 0.85,
     "handling": 1.096,
     "speed": 44.6667,
     "traction": 1.53,
-    "name": "Sentinel Classic Widebody",
+    "name": "Sentinel classique large",
     "make": "Ubermacht",
-    "class": 6,
+    "class": "S",
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 75725
+    "price": 0
   },
   "drifttampa": {
     "isUsedInServer": true,
@@ -3964,6 +3976,8 @@
     "price": 75410
   },
   "driftvorschlag": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.7085,
     "braking": 0.725,
     "handling": 1.0885,
@@ -3971,11 +3985,11 @@
     "traction": 1.53,
     "name": "Vorschlaghammer",
     "make": "Benefactor",
-    "class": 1,
+    "class": "S",
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 76141
+    "price": 0
   },
   "driftyosemite": {
     "isUsedInServer": true,
@@ -4411,6 +4425,8 @@
     "price": 110420
   },
   "envisage": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.175,
     "braking": 0.82,
     "handling": 0.555,
@@ -4418,11 +4434,11 @@
     "traction": 2.72,
     "name": "Envisage",
     "make": "Bollokan",
-    "class": 6,
+    "class": "B",
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 55910
+    "price": 0
   },
   "esskey": {
     "isUsedInServer": true,
@@ -4473,6 +4489,8 @@
     "price": 44850
   },
   "eurosx32": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.28,
     "braking": 0.8,
     "handling": 0.71,
@@ -4480,11 +4498,11 @@
     "traction": 2.287,
     "name": "Euros X32",
     "make": "Annis",
-    "class": 3,
+    "class": "B",
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 73492
+    "price": 0
   },
   "everon": {
     "isUsedInServer": true,
@@ -7945,6 +7963,8 @@
     "price": 95620
   },
   "niobe": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.3805,
     "braking": 0.76,
     "handling": 0.8405,
@@ -7952,11 +7972,11 @@
     "traction": 2.605,
     "name": "Niobe",
     "make": "Ubermacht",
-    "class": 6,
+    "class": "S",
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 84364
+    "price": 0
   },
   "nkambulance": {
     "isUsedInServer": true,
@@ -8381,6 +8401,8 @@
     "weapons": true
   },
   "paragon3": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.33,
     "braking": 1.1,
     "handling": 0.71,
@@ -8388,11 +8410,11 @@
     "traction": 2.515,
     "name": "Paragon S",
     "make": "Enus",
-    "class": 6,
+    "class": "A",
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 79357
+    "price": 0
   },
   "pariah": {
     "isUsedInServer": true,
@@ -8748,6 +8770,8 @@
     "price": 4200
   },
   "pipistrello": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.224,
     "braking": 0.92,
     "handling": 0.604,
@@ -8755,13 +8779,15 @@
     "traction": 2.75,
     "name": "Pipistrello",
     "make": "Overflod",
-    "class": 7,
+    "class": "B",
     "seats": 2,
     "doors": 2,
     "type": "automobile",
-    "price": 59413
+    "price": 0
   },
   "pizzaboy": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.12,
     "braking": 0.33,
     "handling": 0.5,
@@ -8769,13 +8795,15 @@
     "traction": 1.66,
     "name": "Pizza Boy",
     "make": "Pegassi",
-    "class": 8,
+    "class": "M",
     "seats": 1,
     "doors": 1,
     "type": "bike",
-    "price": 14051
+    "price": 0
   },
   "poldominator10": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.3,
     "braking": 0.69,
     "handling": 0.68,
@@ -8783,13 +8811,15 @@
     "traction": 2.383,
     "name": "Dominator FX Interceptor",
     "make": "Vapid",
-    "class": 18,
+    "class": "A",
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 81545
+    "price": 0
   },
   "poldorado": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.2168,
     "braking": 0.5,
     "handling": 0.5968,
@@ -8797,11 +8827,11 @@
     "traction": 1.845,
     "name": "Dorado Cruiser",
     "make": "Bravado",
-    "class": 18,
+    "class": "C",
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 69578
+    "price": 0
   },
   "polgauntlet": {
     "isUsedInServer": false,
@@ -8820,6 +8850,8 @@
     "price": 0
   },
   "polgreenwood": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.282,
     "braking": 0.7,
     "handling": 0.662,
@@ -8827,11 +8859,11 @@
     "traction": 2.3,
     "name": "Greenwood Cruiser",
     "make": "Bravado",
-    "class": 18,
+    "class": "B",
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 78897
+    "price": 0
   },
   "police": {
     "isUsedInServer": false,
@@ -8978,20 +9010,24 @@
     "price": 0
   },
   "policet3": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.195,
     "braking": 0.6,
     "handling": 0.575,
     "speed": 42.0369,
     "traction": 2,
-    "name": "Burrito (Bail Enforcement)",
+    "name": "Burrito (exécution des cautions)",
     "make": "",
-    "class": 18,
+    "class": "C",
     "seats": 6,
     "doors": 5,
     "type": "automobile",
-    "price": 69451
+    "price": 0
   },
   "polimpaler5": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.2537,
     "braking": 0.865,
     "handling": 0.6338,
@@ -8999,13 +9035,15 @@
     "traction": 2.3,
     "name": "Impaler SZ Cruiser",
     "make": "Declasse",
-    "class": 18,
+    "class": "B",
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 78875
+    "price": 0
   },
   "polimpaler6": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.3,
     "braking": 0.7,
     "handling": 0.68,
@@ -9013,11 +9051,11 @@
     "traction": 2.135,
     "name": "Impaler LX Cruiser",
     "make": "Declasse",
-    "class": 18,
+    "class": "B",
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 77917
+    "price": 0
   },
   "polmav": {
     "isUsedInServer": false,
@@ -13732,6 +13770,8 @@
     "price": 3400
   },
   "vorschlaghammer": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.265,
     "braking": 0.625,
     "handling": 0.645,
@@ -13739,11 +13779,11 @@
     "traction": 2.065,
     "name": "Vorschlaghammer",
     "make": "Benefactor",
-    "class": 1,
+    "class": "B",
     "seats": 4,
     "doors": 6,
     "type": "automobile",
-    "price": 71976
+    "price": 0
   },
   "vortex": {
     "isUsedInServer": true,
@@ -14002,6 +14042,8 @@
     "price": 22690
   },
   "yosemite1500": {
+    "isUsedInServer": false,
+    "isPlayerAllowed": false,
     "acceleration": 0.2335,
     "braking": 0.53,
     "handling": 0.6135,
@@ -14009,11 +14051,11 @@
     "traction": 2,
     "name": "Yosemite 1500",
     "make": "Declasse",
-    "class": 9,
+    "class": "C",
     "seats": 2,
     "doors": 4,
     "type": "automobile",
-    "price": 70731
+    "price": 0
   },
   "yosemite2": {
     "isUsedInServer": false,
