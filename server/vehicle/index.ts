@@ -193,6 +193,7 @@ setInterval(async () => {
 				}
 			}
 		}
+		await sleep(1);
 	}
 }, 5000);
 
