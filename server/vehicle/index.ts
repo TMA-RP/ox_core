@@ -181,16 +181,16 @@ setInterval(async () => {
 							}
 						} else {
 							vehicle.set('properties', properties);
+							if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity)) {
+								const coords = GetEntityCoords(vehicle.entity);
+								const heading = GetEntityHeading(vehicle.entity);
+								vehicle.set('coords', [coords[0], coords[1], coords[2], heading]);
+							}
 						}
 					}
 				} catch (error) {
 					// console.error('Error in triggerClientCallback:', error);
 				}
-			}
-			if (vehicle && vehicle.entity && DoesEntityExist(vehicle.entity) && !Entity(vehicle.entity).state["ox_lib:setVehicleProperties"]) {
-				const coords = GetEntityCoords(vehicle.entity);
-				const heading = GetEntityHeading(vehicle.entity);
-				vehicle.set('coords', [coords[0], coords[1], coords[2], heading]);
 			}
 		}
 	}
